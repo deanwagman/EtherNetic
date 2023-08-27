@@ -37,6 +37,16 @@ export default () => {
     console.log(data);
   };
 
+  const registerUser = async ({ username, password }) => {
+    const response = await fetch('/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    });
+    const data = await response.json();
+    console.log(data);
+  };
+
   const { hunger, happiness, health, energy, sleeping, dead } = state;
 
   useEffect(() => {
@@ -45,17 +55,6 @@ export default () => {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
-
-  // useEffect(() => {
-  //   if (dead) {
-  //     playDeathSound();
-  //     document.startViewTransition(() => {
-  //       flushSync(() => {
-  //         dispatch({ type: 'DIE' });
-  //       });
-  //     });
-  //   }
-  // }, [dead]);
 
   return (
     <div>
@@ -80,6 +79,12 @@ export default () => {
       </button>
       <button type="button" onClick={() => apiTest()}>
         api test
+      </button>
+      <button
+        type="button"
+        onClick={() => registerUser({ username: 'test', password: 'test' })}
+      >
+        register user
       </button>
     </div>
   );
