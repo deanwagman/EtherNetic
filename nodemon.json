@@ -1,0 +1,6 @@
+{
+    "exec": "babel-node --config-file ./config/.babelrc",
+    "watch": ["src/"],
+    "ext": "js,jsx"
+}
+  
