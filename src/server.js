@@ -1,3 +1,4 @@
+import { config } from 'dotenv';
 import express from 'express';
 import { renderToString } from 'react-dom/server';
 import { createProxyMiddleware } from 'http-proxy-middleware';
@@ -9,8 +10,10 @@ import Document from './Document';
 import App from './App';
 import path from 'path';
 
+config();
+
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
