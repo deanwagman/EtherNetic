@@ -31,6 +31,12 @@ export default () => {
     });
   };
 
+  const apiTest = async () => {
+    const response = await fetch('/api/test');
+    const data = await response.json();
+    console.log(data);
+  };
+
   const { hunger, happiness, health, energy, sleeping, dead } = state;
 
   useEffect(() => {
@@ -71,6 +77,9 @@ export default () => {
       </button>
       <button type="button" onClick={() => kill()}>
         test
+      </button>
+      <button type="button" onClick={() => apiTest()}>
+        api test
       </button>
     </div>
   );

@@ -1,4 +1,6 @@
 import { config } from 'dotenv';
+config();
+
 import express from 'express';
 import { renderToString } from 'react-dom/server';
 import { createProxyMiddleware } from 'http-proxy-middleware';
@@ -10,7 +12,7 @@ import Document from './Document';
 import App from './App';
 import path from 'path';
 
-config();
+import db from './db/';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -26,6 +28,13 @@ app.get('/', (req, res) => {
       </Document>,
     ),
   );
+});
+
+console.log({ db });
+
+app.route('/api/test').get(async (req, res) => {
+  const { rows } = await db.query('SELECT * FROM pets');
+  res.send(rows);
 });
 
 if (process.env.NODE_ENV === 'development') {
