@@ -1,7 +1,7 @@
+import bcrypt from 'bcrypt';
 import db from '../../db';
-import getUsername from '../../db/users/getUsername';
-import createUser from '../../db/users/createUser';
 import { generate as generateToken } from '../../util/jwt';
+import getUsername from '../../db/users/getUsername';
 
 export const post = async (req, res) => {
   const { body } = req;
@@ -13,18 +13,24 @@ export const post = async (req, res) => {
     return;
   }
 
-  // Check if username already exists
+  // Get user
   const user = await getUsername(username);
 
-  if (user) {
-    res.status(400).send('Username already exists');
+  if (!user) {
+    res.status(400).send('Username does not exist');
     return;
   }
 
-  // Create new user
-  const { id } = await createUser({ username, password });
+  // Check password
+  const valid = await bcrypt.compare(password, user.password);
 
-  const token = generateToken(id);
+  if (!valid) {
+    res.status(400).send('Incorrect password');
+    return;
+  }
+
+  // Generate token
+  const token = generateToken(user.id);
 
   res.cookie('token', token, {
     httpOnly: true,

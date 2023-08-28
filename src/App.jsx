@@ -47,6 +47,16 @@ export default () => {
     console.log(data);
   };
 
+  const loginUser = async ({ username, password }) => {
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    });
+    const data = await response.json();
+    console.log(data);
+  };
+
   const { hunger, happiness, health, energy, sleeping, dead } = state;
 
   useEffect(() => {
@@ -82,9 +92,17 @@ export default () => {
       </button>
       <button
         type="button"
-        onClick={() => registerUser({ username: 'test', password: 'test' })}
+        onClick={() =>
+          registerUser({ username: 'clarabelle', password: 'clayton' })
+        }
       >
         register user
+      </button>
+      <button
+        type="button"
+        onClick={() => loginUser({ username: 'bill', password: 'board' })}
+      >
+        login user
       </button>
     </div>
   );
