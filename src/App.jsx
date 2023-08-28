@@ -1,12 +1,28 @@
 import React, { useReducer, useEffect } from 'react';
+import { flushSync } from 'react-dom';
+import { Provider as StyleProvider } from 'styletron-react';
+import { Client as Styletron } from 'styletron-engine-atomic';
+import { styled } from 'styletron-react';
+
 import Pet from './components/Pet';
 import {
   reducer as petReducer,
   initialState as petInitialState,
 } from './state/pet';
-import { flushSync } from 'react-dom';
 
 import './style.css';
+
+const Button = styled('button', (props) => ({
+  padding: '0.5em 1em',
+  color: props.$isActive ? '#fff' : '#000',
+  background: props.$isActive ? '#276ef1' : 'none',
+  fontSize: '1em',
+  borderRadius: '4px',
+  border: '1px solid #aaa',
+  ':hover': {
+    background: props.$isActive ? 'green' : 'yellow',
+  },
+}));
 
 export default () => {
   const [state, dispatch] = useReducer(petReducer, petInitialState);
@@ -67,7 +83,7 @@ export default () => {
   }, []);
 
   return (
-    <div>
+    <div className="app">
       <Pet
         hunger={hunger}
         happiness={happiness}
@@ -98,12 +114,12 @@ export default () => {
       >
         register user
       </button>
-      <button
+      <Button
         type="button"
         onClick={() => loginUser({ username: 'bill', password: 'board' })}
       >
         login user
-      </button>
+      </Button>
     </div>
   );
 };
