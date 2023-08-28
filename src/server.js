@@ -28,20 +28,22 @@ const port = process.env.PORT || 3000;
 
 const engine = new Styletron();
 
+// Render markup for Client
+const html = renderToString(
+  <StyleProvider value={engine} id="styletron">
+    <App />
+  </StyleProvider>,
+);
+
+// Extract CSS from Styletron
+const styles = engine.getCss();
+
 app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
 
 app.get('/', async (req, res) => {
-  res.send(
-    renderToString(
-      <Document>
-        <StyleProvider value={engine} id="styletron">
-          <App />
-        </StyleProvider>
-      </Document>,
-    ),
-  );
+  res.send(renderToString(<Document styles={styles} html={html} />));
 });
 
 app.route('/api/register').post(register);

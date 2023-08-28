@@ -5,7 +5,9 @@ import { Provider as StyleProvider } from 'styletron-react';
 
 import App from './App';
 
-const clientEngine = new Styletron();
+const clientEngine = new Styletron({
+  hydrate: document.getElementById('styletron'),
+});
 
 hydrateRoot(
   document.getElementById('root'),
