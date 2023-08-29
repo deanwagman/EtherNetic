@@ -7,6 +7,7 @@ export default ({ html, styles }) => (
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>Pet</title>
       <style>{styles}</style>
+      <link rel="stylesheet" href="/dist/reset.css" />
     </head>
     <body>
       <div id="root" dangerouslySetInnerHTML={{ __html: html }} />

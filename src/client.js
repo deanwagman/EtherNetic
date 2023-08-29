@@ -2,8 +2,9 @@ import React from 'react';
 import { hydrateRoot } from 'react-dom/client';
 import { Client as Styletron } from 'styletron-engine-atomic';
 import { Provider as StyleProvider } from 'styletron-react';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-import App from './App';
+import router from './routes/router';
 
 const clientEngine = new Styletron({
   hydrate: document.getElementById('styletron'),
@@ -12,7 +13,7 @@ const clientEngine = new Styletron({
 hydrateRoot(
   document.getElementById('root'),
   <StyleProvider value={clientEngine} id="styletron">
-    <App />
+    <RouterProvider router={router} />
   </StyleProvider>,
 );
 

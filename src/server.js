@@ -14,7 +14,7 @@ import { Provider as StyleProvider } from 'styletron-react';
 import { Server as Styletron } from 'styletron-engine-atomic';
 
 import webpackConfig from '../webpack.config';
-import Document from './Document';
+import Document from './components/Document';
 
 import App from './App';
 import db from './db/';
@@ -41,6 +41,8 @@ const styles = engine.getCss();
 app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
+
+app.use(express.static(__dirname + '/dist'));
 
 app.get('/', async (req, res) => {
   res.send(renderToString(<Document styles={styles} html={html} />));

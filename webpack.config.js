@@ -1,5 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   mode: process.env.NODE_ENV === 'development' ? 'development' : 'production',
@@ -47,6 +48,9 @@ module.exports = {
   plugins: [
     new webpack.HotModuleReplacementPlugin(), // Add HMR plugin
     new webpack.NoEmitOnErrorsPlugin(), // Useful for keeping the console clean from error noise
+    new CopyWebpackPlugin({
+      patterns: [{ from: 'src/stylesheets/reset.css', to: 'reset.css' }],
+    }),
   ],
 
   devServer: {
