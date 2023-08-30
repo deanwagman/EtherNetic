@@ -170,3 +170,9 @@ button,
 *::after {
   box-sizing: border-box;
 }
+
+body,
+height,
+#root {
+  height: 100%;
+}

@@ -8,6 +8,8 @@ export default {
   auroraGreen: 'rgba(133, 193, 126, 1)',
   waxSealBrown: 'rgba(150, 76, 42, 1)',
   etherealMistWhite: 'rgba(245, 245, 245, 1)',
+  midnightBlue: 'rgba(10, 24, 39, 1)',
+  ceruleanBlue: 'rgba(42, 157, 244, 1)',
 
   /* Semantic Colors */
   background: 'rgba(43, 87, 151, 1)',
