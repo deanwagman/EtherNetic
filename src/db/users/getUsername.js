@@ -8,6 +8,6 @@ export default async (username) => {
     const { rows } = await db.query(query, values);
     return rows[0];
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };

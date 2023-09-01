@@ -9,7 +9,7 @@ export const post = async (req, res) => {
 
   // Check Validations
   if (!username || !password) {
-    res.status(400).send('Missing username or password');
+    res.status(400).send({ error: 'Username and password required' });
     return;
   }
 
@@ -17,7 +17,7 @@ export const post = async (req, res) => {
   const user = await getUsername(username);
 
   if (user) {
-    res.status(400).send('Username already exists');
+    res.status(400).send({ error: 'User already exists' });
     return;
   }
 
@@ -28,10 +28,8 @@ export const post = async (req, res) => {
 
   res.cookie('token', token, {
     httpOnly: true,
-    // sameSite: 'strict',
-    // secure: process.env.NODE_ENV === 'production',
   });
 
   // Send response
-  res.status(200).send({ token });
+  res.status(200).send({ success: true });
 };

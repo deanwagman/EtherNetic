@@ -1,6 +1,8 @@
 import React from 'react';
 import { styled, useStyletron } from 'styletron-react';
 import colors from '../../constants/colors';
+import { Outlet } from 'react-router-dom';
+import Nav from '../Nav';
 
 const Container = styled('div', {
   background:
@@ -58,11 +60,18 @@ const AmbientGradient = styled('div', (props) => ({
   mixBlendMode: 'overlay',
 }));
 
+const Main = styled('main', {
+  position: 'relative',
+  zIndex: 2,
+});
+
 export default ({ children }) => {
   return (
     <Container>
-      <nav>Nav</nav>
-      <main>{children}</main>
+      <Main>
+        <Nav />
+        <Outlet />
+      </Main>
 
       <AmbientGradient
         delay="7s"

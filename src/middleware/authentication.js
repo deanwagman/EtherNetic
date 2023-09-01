@@ -13,14 +13,15 @@ export default async (req, res, next) => {
   }
 
   try {
+    // Verify token
     const payload = jwt.verify(token, process.env.JWT_SECRET);
 
-    console.log({ payload });
-
+    // Get user from database
     const { rows } = await db.query('SELECT * FROM users WHERE id = $1', [
       payload.id,
     ]);
 
+    // If user doesn't exist, send 401
     if (!rows[0]) {
       res.status(401).send('Invalid token');
       return;
@@ -29,7 +30,7 @@ export default async (req, res, next) => {
     req.user = rows[0];
     next();
   } catch (e) {
-    console.error({ e });
+    // If token is invalid, send 401
     res.status(401).send('Invalid token');
   }
 };

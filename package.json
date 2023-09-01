@@ -9,8 +9,8 @@
   "scripts": {
     "start": "NODE_ENV=production nodemon --exec babel-node src/server.js",
     "dev:client": "NODE_ENV=development webpack --watch",
-    "dev:server": "NODE_ENV=development nodemon --exec babel-node src/server.js --watch src/server",
-    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "dev:server": "NODE_ENV=development nodemon --exec babel-node src/server.js --watch src/",
+    "dev": "NODE_ENV=development concurrently \"npm run dev:client\" \"npm run dev:server\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -24,6 +24,7 @@
     "express": "^4.18.2",
     "http-proxy-middleware": "^2.0.6",
     "jsonwebtoken": "^9.0.1",
+    "node-fetch": "^3.3.2",
     "pg": "^8.11.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

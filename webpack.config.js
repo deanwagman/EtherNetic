@@ -11,7 +11,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
-    publicPath: '/dist/',
+    publicPath: '/dist',
   },
   resolve: {
     extensions: ['.js', '.jsx'],
@@ -49,7 +49,10 @@ module.exports = {
     new webpack.HotModuleReplacementPlugin(), // Add HMR plugin
     new webpack.NoEmitOnErrorsPlugin(), // Useful for keeping the console clean from error noise
     new CopyWebpackPlugin({
-      patterns: [{ from: 'src/stylesheets/reset.css', to: 'reset.css' }],
+      patterns: [
+        { from: 'src/stylesheets/reset.css', to: 'reset.css' },
+        { from: 'src/assets', to: 'assets' },
+      ],
     }),
   ],
 

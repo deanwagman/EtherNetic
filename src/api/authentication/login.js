@@ -9,7 +9,7 @@ export const post = async (req, res) => {
 
   // Check Validations
   if (!username || !password) {
-    res.status(400).send('Missing username or password');
+    res.status(400).send({ error: 'Username and password required' });
     return;
   }
 
@@ -17,7 +17,7 @@ export const post = async (req, res) => {
   const user = await getUsername(username);
 
   if (!user) {
-    res.status(400).send('Username does not exist');
+    res.status(400).send({ error: 'User does not exist' });
     return;
   }
 
@@ -25,7 +25,7 @@ export const post = async (req, res) => {
   const valid = await bcrypt.compare(password, user.password);
 
   if (!valid) {
-    res.status(400).send('Incorrect password');
+    res.status(400).send({ error: 'Invalid password' });
     return;
   }
 
@@ -34,10 +34,8 @@ export const post = async (req, res) => {
 
   res.cookie('token', token, {
     httpOnly: true,
-    // sameSite: 'strict',
-    // secure: process.env.NODE_ENV === 'production',
   });
 
   // Send response
-  res.status(200).send({ token });
+  res.status(200).send({ success: true });
 };

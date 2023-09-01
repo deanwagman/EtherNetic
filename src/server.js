@@ -7,11 +7,13 @@ import path from 'path';
 import { renderToString } from 'react-dom/server';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import webpackDevMiddleware from 'webpack-dev-middleware';
+import webpackHotMiddleware from 'webpack-hot-middleware';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import webpack from 'webpack';
 import { Provider as StyleProvider } from 'styletron-react';
 import { Server as Styletron } from 'styletron-engine-atomic';
+import { StaticRouterProvider } from 'react-router-dom/server';
 
 import webpackConfig from '../webpack.config';
 import Document from './components/Document';
@@ -19,6 +21,8 @@ import Document from './components/Document';
 import App from './App';
 import db from './db/';
 import authMiddleware from './middleware/authentication';
+import routes from './routes/routes';
+import { getStaticRouter } from './routes/router';
 
 import { post as register } from './api/authentication/register';
 import { post as login } from './api/authentication/login';
@@ -28,33 +32,9 @@ const port = process.env.PORT || 3000;
 
 const engine = new Styletron();
 
-// Render markup for Client
-const html = renderToString(
-  <StyleProvider value={engine} id="styletron">
-    <App />
-  </StyleProvider>,
-);
-
-// Extract CSS from Styletron
-const styles = engine.getCss();
-
 app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
-
-app.use(express.static(__dirname + '/dist'));
-
-app.get('/', async (req, res) => {
-  res.send(renderToString(<Document styles={styles} html={html} />));
-});
-
-app.route('/api/register').post(register);
-app.route('/api/login').post(login);
-
-app.route('/api/test').get(async (req, res) => {
-  const { rows } = await db.query('SELECT * FROM pets');
-  res.send(rows);
-});
 
 if (process.env.NODE_ENV === 'development') {
   const compiler = webpack(webpackConfig);
@@ -65,9 +45,38 @@ if (process.env.NODE_ENV === 'development') {
     }),
   );
 
-  app.use(webpackDevMiddleware(compiler));
+  app.use(webpackHotMiddleware(compiler));
+
+  console.log('Webpack Dev Middleware Enabled');
 }
 
+app.use(express.static(path.join(__dirname, 'dist')));
+
+app.route('/api/register').post(register);
+app.route('/api/login').post(login);
+
+app.route('/api/test').get(async (req, res) => {
+  const { rows } = await db.query('SELECT * FROM pets');
+  res.send(rows);
+});
+
+// Serve the SPA on every route
+app.get('*', async (req, res) => {
+  const { router, context } = await getStaticRouter(req);
+
+  // Render markup for Client
+  const html = renderToString(
+    <StyleProvider value={engine} id="styletron">
+      <StaticRouterProvider router={router} context={context} />
+    </StyleProvider>,
+  );
+
+  // Extract CSS from Styletron
+  const styles = engine.getCss();
+
+  res.send(renderToString(<Document styles={styles} html={html} />));
+});
+
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  console.log(`App listening on port ${port}`);
 });
