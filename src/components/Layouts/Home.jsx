@@ -3,11 +3,11 @@ import { styled, useStyletron } from 'styletron-react';
 import colors from '../../constants/colors';
 import { Outlet } from 'react-router-dom';
 import Nav from '../Nav';
+import Notifications from '../Notifications';
 
 const Container = styled('div', {
   background:
     'radial-gradient(circle, rgba(10, 24, 39, 1), rgba(42, 157, 244, 1))',
-  padding: '1em',
   height: '100%',
   overflow: 'hidden',
   position: 'relative',
@@ -69,6 +69,7 @@ export default ({ children }) => {
   return (
     <Container>
       <Main>
+        <Notifications />
         <Nav />
         <Outlet />
       </Main>

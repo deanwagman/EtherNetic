@@ -10,7 +10,6 @@ const Input = styled('input', {
   fontSize: '1em',
   borderRadius: '4px',
   transition: 'background 0.2s ease-in-out',
-  letterSpacing: '0.1em',
   background: 'rgba(255,255,255,0.5)',
   ':hover': {
     animationDuration: '300ms',
@@ -26,7 +25,7 @@ const Input = styled('input', {
   },
   width: '100%',
   maxWidth: '400px',
-  fontFamily: 'Orbitron, sans-serif',
+  fontFamily: '"Open Sans", sans-serif',
   backdropFilter: 'blur(10px)',
   backgroundClip: 'border-box',
   boxShadow: '0px 0px 5px rgba(255,255,255,0.1)',

@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
+import { flushSync } from 'react-dom';
 import { styled } from 'styletron-react';
+import { useNavigate } from 'react-router-dom';
 import TextInput from './Form/TextInput';
 import colors from '../constants/colors';
 import { colorShift } from '../util/styles';
 import Button from './Form/Button';
 import Surface from './Surface';
 import Title from './form/Title';
+import useNotifications from '../hooks/useNotifications';
+import viewTransition from '../util/viewTransitions';
 
 const Container = styled('div', {
   display: 'flex',
@@ -16,9 +20,17 @@ const Container = styled('div', {
   height: '100%',
 });
 
+const Form = styled('form', {
+  maxWidth: '400px',
+  width: '100%',
+});
+
 export default () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+
+  const { add: addNotification } = useNotifications();
 
   const onUsernameChange = (e) => {
     setUsername(e.target.value);
@@ -45,33 +57,36 @@ export default () => {
     const response = await loginUser({ username, password });
 
     if (response.success) {
-      console.log('success');
+      navigate('/dashboard');
     } else {
-      console.log('failure');
+      console.log('Going to call');
+      addNotification({ message: response.error });
     }
   };
 
   return (
     <Container>
       <Title>Log In</Title>
-      <Surface $as="form" onSubmit={onSubmit}>
-        <TextInput
-          name="Username"
-          value={username}
-          required
-          onChange={onUsernameChange}
-        />
-        <TextInput
-          name="Password"
-          type="password"
-          value={password}
-          required
-          onChange={onPasswordChange}
-        />
-      </Surface>
-      <Button type="submit" onClick={onSubmit}>
-        Send
-      </Button>
+      <Form onSubmit={onSubmit}>
+        <Surface>
+          <TextInput
+            name="Username"
+            value={username}
+            required
+            onChange={onUsernameChange}
+          />
+          <TextInput
+            name="Password"
+            type="password"
+            value={password}
+            required
+            onChange={onPasswordChange}
+          />
+        </Surface>
+        <Button type="submit" onClick={onSubmit}>
+          Send
+        </Button>
+      </Form>
     </Container>
   );
 };

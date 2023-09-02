@@ -3,6 +3,7 @@ import { hydrateRoot } from 'react-dom/client';
 import { Client as Styletron } from 'styletron-engine-atomic';
 import { Provider as StyleProvider } from 'styletron-react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import NotificationsProvider from './state/notifications';
 
 import { getBrowserRouter } from './routes/router';
 
@@ -15,7 +16,9 @@ const router = getBrowserRouter();
 hydrateRoot(
   document.getElementById('root'),
   <StyleProvider value={clientEngine} id="styletron">
-    <RouterProvider router={router} />
+    <NotificationsProvider>
+      <RouterProvider router={router} />
+    </NotificationsProvider>
   </StyleProvider>,
 );
 

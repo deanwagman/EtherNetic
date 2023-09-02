@@ -34,7 +34,7 @@ export default ({ html, styles }) => (
         crossOrigin="true"
       />
       <link
-        href="https://fonts.googleapis.com/css2?family=Cormorant+Upright:wght@300&family=Orbitron&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500&family=Open+Sans:ital,wght@0,400;0,700;1,300&family=Raleway&display=swap"
         rel="stylesheet"
       />
     </head>

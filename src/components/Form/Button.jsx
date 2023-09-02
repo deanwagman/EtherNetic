@@ -12,9 +12,8 @@ const Button = styled('button', {
   borderRadius: '4px',
   width: '100%',
   maxWidth: '400px',
-  fontFamily: 'Orbitron, sans-serif',
+  fontFamily: '"Raleway", sans-serif',
   marginTop: '2em',
-  letterSpacing: '0.1em',
 });
 
 export default (props) => {

@@ -23,6 +23,7 @@ import db from './db/';
 import authMiddleware from './middleware/authentication';
 import routes from './routes/routes';
 import { getStaticRouter } from './routes/router';
+import NotificationsProvider from './state/notifications';
 
 import { post as register } from './api/authentication/register';
 import { post as login } from './api/authentication/login';
@@ -67,7 +68,9 @@ app.get('*', async (req, res) => {
   // Render markup for Client
   const html = renderToString(
     <StyleProvider value={engine} id="styletron">
-      <StaticRouterProvider router={router} context={context} />
+      <NotificationsProvider>
+        <StaticRouterProvider router={router} context={context} />
+      </NotificationsProvider>
     </StyleProvider>,
   );
 

@@ -5,6 +5,7 @@ import colors from '../constants/colors';
 import Surface from './Surface';
 import Button from './Form/Button';
 import Title from './form/Title';
+import useNotifications from '../hooks/useNotifications';
 
 const userNameRegex = /^[a-zA-Z0-9_]{3,24}$/;
 const passwordRegex = /^.{8,64}$/;
@@ -16,6 +17,11 @@ const Container = styled('div', {
   justifyContent: 'center',
   width: '100%',
   height: '100%',
+});
+
+const Form = styled('form', {
+  maxWidth: '400px',
+  width: '100%',
 });
 
 const registerUser = async ({ username, password }) => {
@@ -32,6 +38,7 @@ const registerUser = async ({ username, password }) => {
 export default () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const { add: addNotification } = useNotifications();
 
   const onUsernameChange = (e) => {
     setUsername(e.target.value);
@@ -55,7 +62,7 @@ export default () => {
 
     const isValid = validate();
     if (!isValid) {
-      alert('Invalid username or password');
+      addNotification({ message: 'Invalid username or password' });
       return;
     }
 
@@ -64,37 +71,38 @@ export default () => {
     if (response.success) {
       alert('Success!');
     } else {
-      alert('Failure!');
+      addNotification({ message: response.error });
     }
   };
 
   return (
     <Container>
       <Title>Register</Title>
-      <Surface $as="form" onSubmit={onSubmit}>
-        <TextInput
-          name="Username"
-          value={username}
-          required
-          minLength="3"
-          maxLength="24"
-          pattern={userNameRegex}
-          onChange={onUsernameChange}
-        />
-        <TextInput
-          name="Password"
-          type="password"
-          value={password}
-          required
-          minLength="8"
-          maxLength="64"
-          pattern={passwordRegex}
-          onChange={onPasswordChange}
-        />
-      </Surface>
-      <Button type="submit" onClick={onSubmit}>
-        Send
-      </Button>
+      <Form onSubmit={onSubmit}>
+        <Surface>
+          <TextInput
+            name="Username"
+            value={username}
+            required
+            minLength="3"
+            maxLength="24"
+            pattern={userNameRegex}
+            onChange={onUsernameChange}
+          />
+          <TextInput
+            name="Password"
+            type="password"
+            required
+            minLength="8"
+            maxLength="64"
+            pattern={passwordRegex}
+            onChange={onPasswordChange}
+          />
+        </Surface>
+        <Button type="submit" onClick={onSubmit}>
+          Send
+        </Button>
+      </Form>
     </Container>
   );
 };

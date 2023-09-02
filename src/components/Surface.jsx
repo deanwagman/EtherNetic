@@ -7,7 +7,6 @@ export default styled('div', {
   alignItems: 'center',
   justifyContent: 'center',
   width: '100%',
-  maxWidth: '400px',
   background: 'rgba(0, 0, 0, 0.2)',
   borderRadius: '8px',
   boxShadow: '0 0 10px rgba(0,0,0,0.5))',

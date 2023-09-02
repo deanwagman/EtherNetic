@@ -9,8 +9,7 @@ export default styled('label', {
   marginTop: '1.5em',
   textAlign: 'start',
   width: '100%',
-  fontFamily: 'Orbitron, sans-serif',
-  letterSpacing: '0.1em',
+  fontFamily: '"Raleway", sans-serif',
   ':first-of-type': {
     marginTop: 0,
   },
