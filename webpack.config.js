@@ -50,7 +50,7 @@ module.exports = {
     new webpack.NoEmitOnErrorsPlugin(), // Useful for keeping the console clean from error noise
     new CopyWebpackPlugin({
       patterns: [
-        { from: 'src/stylesheets/reset.css', to: 'reset.css' },
+        { from: 'src/stylesheets', to: 'styles' },
         { from: 'src/assets', to: 'assets' },
       ],
     }),

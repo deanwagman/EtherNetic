@@ -1,0 +1,23 @@
+@keyframes slide-in-fade-in {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ::view-transition-new(notification):only-child {
+  animation-name: slide-in-fade-in;
+  animation-duration: 1s;
+  animation-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+::view-transition-old(notification):only-child {
+  animation-name: slide-in-fade-in;
+  animation-duration: 500ms;
+  animation-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
+  animation-direction: reverse;
+} */
