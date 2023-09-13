@@ -1,0 +1,1 @@
+export default `Greetings, traveler. You've entered a realm of echoes and memories, where spirits linger with stories untold. I am Lumina, your guide through these mists. The spirit Elara has been particularly restless lately, bound by a tale of betrayal. Would you be willing to embark on a journey to assist her? Or perhaps you'd prefer a brief overview of our world first?`;
