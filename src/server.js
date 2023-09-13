@@ -28,6 +28,13 @@ import NotificationsProvider from './state/notifications';
 import { post as register } from './api/authentication/register';
 import { post as login } from './api/authentication/login';
 
+import chatMessage from './api/chat/message';
+import simulateFineTune from './api/fine-tune/simulate';
+
+import createPrompt from './api/prompts/create';
+
+import autoComplete from './api/chat/autoComplete';
+
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -55,11 +62,11 @@ app.use(express.static(path.join(__dirname, 'dist')));
 
 app.route('/api/register').post(register);
 app.route('/api/login').post(login);
+app.route('/api/message').post(chatMessage);
+app.route('/api/fine-tune/simulate').post(simulateFineTune);
+app.route('/api/auto-complete').post(autoComplete);
 
-app.route('/api/test').get(async (req, res) => {
-  const { rows } = await db.query('SELECT * FROM pets');
-  res.send(rows);
-});
+app.route('/api/prompts/create').post(createPrompt);
 
 // Serve the SPA on every route
 app.get('*', async (req, res) => {

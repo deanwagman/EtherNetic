@@ -16,7 +16,7 @@ const Container = styled('ul', {
   zIndex: '10',
 });
 
-const Notification = styled('li', {
+const Notification = styled('li', ({ id }) => ({
   background: 'rgba(0, 0, 0, 0.2)',
   borderRadius: '8px',
   boxShadow: '0 0 10px rgba(0,0,0,0.5))',
@@ -29,7 +29,8 @@ const Notification = styled('li', {
   maxWidth: '600px',
   position: 'relative',
   ...colorShift,
-});
+  viewTransitionName: `notification-${id}`,
+}));
 
 const Close = styled('button', {
   position: 'absolute',
@@ -69,7 +70,7 @@ export default () => {
   return (
     <Container>
       {notifications.map((notification, index) => (
-        <Notification key={index}>
+        <Notification key={index} id={notification.id}>
           {notification.message}
           <Close onClick={() => removeNotification(notification.id)}>×</Close>
         </Notification>

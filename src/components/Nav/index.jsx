@@ -1,8 +1,19 @@
 import React from 'react';
 import { styled } from 'styletron-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { colorShift } from '../../util/styles';
 import colors from '../../constants/colors';
+import viewTransition from '../../util/viewTransitions';
+
+const TransitionLink = ({ to, children }) => {
+  const navigate = useNavigate();
+
+  const onClick = () => {
+    viewTransition(() => navigate(to));
+  };
+
+  return <div onClick={onClick}>{children}</div>;
+};
 
 const Nav = styled('nav', {
   display: 'flex',
@@ -24,7 +35,7 @@ const Logo = styled('h1', {
   textBackgroundClip: 'text',
   textShadow: '0 0 10px rgba(0,0,0,0.5))',
   animationName: {
-    0: {
+    '0%': {
       transform: 'scale(1)',
       opacity: 1,
     },
@@ -41,7 +52,7 @@ const Logo = styled('h1', {
   animationIterationCount: 'infinite',
 });
 
-const NavLink = styled(Link, {
+const NavLink = styled(TransitionLink, {
   color: colors.etherealMistWhite,
   textDecoration: 'none',
   fontSize: '1em',

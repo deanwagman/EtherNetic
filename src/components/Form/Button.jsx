@@ -14,6 +14,13 @@ const Button = styled('button', {
   maxWidth: '400px',
   fontFamily: '"Raleway", sans-serif',
   marginTop: '2em',
+  transition: 'all 0.2s ease-in-out',
+  ':hover': {
+    backdropFilter: 'hue-rotate(180deg)',
+    boxShadow: 'rgba(255,255,255,0.5) 0px 0px 80px',
+    cursor: 'pointer',
+    transform: `scale(1.05)`,
+  },
 });
 
 export default (props) => {

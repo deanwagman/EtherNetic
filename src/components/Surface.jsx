@@ -4,9 +4,8 @@ import { colorShift } from '../util/styles';
 export default styled('div', {
   display: 'flex',
   flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: '100%',
+  // alignItems: 'center',
+  // justifyContent: 'center',
   background: 'rgba(0, 0, 0, 0.2)',
   borderRadius: '8px',
   boxShadow: '0 0 10px rgba(0,0,0,0.5))',

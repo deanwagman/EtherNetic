@@ -57,9 +57,8 @@ export default () => {
     const response = await loginUser({ username, password });
 
     if (response.success) {
-      navigate('/dashboard');
+      navigate('../etherboard');
     } else {
-      console.log('Going to call');
       addNotification({ message: response.error });
     }
   };

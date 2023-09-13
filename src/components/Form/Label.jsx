@@ -9,8 +9,9 @@ export default styled('label', {
   marginTop: '1.5em',
   textAlign: 'start',
   width: '100%',
+  textTransform: 'capitalize',
   fontFamily: '"Raleway", sans-serif',
-  ':first-of-type': {
+  ':first-child': {
     marginTop: 0,
   },
 });

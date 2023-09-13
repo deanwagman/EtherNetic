@@ -7,7 +7,8 @@ export default ({ html, styles }) => (
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>Pet</title>
       <style>{styles}</style>
-      <link rel="stylesheet" href="/dist/reset.css" />
+      <link rel="stylesheet" href="/dist/styles/view-transitions.css" />
+      <link rel="stylesheet" href="/dist/styles/reset.css" />
       <link
         rel="apple-touch-icon"
         sizes="180x180"
@@ -34,7 +35,7 @@ export default ({ html, styles }) => (
         crossOrigin="true"
       />
       <link
-        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500&family=Open+Sans:ital,wght@0,400;0,700;1,300&family=Raleway&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500&family=Open+Sans:ital,wght@0,400;0,700;1,300&family=Raleway&family=Space+Mono&display=block"
         rel="stylesheet"
       />
     </head>
