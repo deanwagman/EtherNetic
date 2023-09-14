@@ -1,35 +1,47 @@
 import db from '../../db';
-import getUsername from '../../db/users/getUsername';
-import createUser from '../../db/users/createUser';
 import { generate as generateToken } from '../../util/jwt';
+import bcrypt from 'bcrypt';
 
 export const post = async (req, res) => {
   const { body } = req;
-  const { username, password } = body;
+  const { username, password, email } = body;
 
   // Check Validations
-  if (!username || !password) {
-    res.status(400).send({ error: 'Username and password required' });
+  if (!username || !password || !email) {
+    res.status(400).send({ error: 'Missing field required' });
     return;
   }
 
   // Check if username already exists
-  const user = await getUsername(username);
+  const user = await db.User.findOne({ where: { username } });
 
   if (user) {
     res.status(400).send({ error: 'User already exists' });
     return;
   }
 
-  // Create new user
-  const { id } = await createUser({ username, password });
+  try {
+    // Hash and salt the password
+    const saltRounds = 10; // You can adjust this value
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-  const token = generateToken(id);
+    // Create new user
+    const newUser = await db.User.create({
+      username,
+      password: hashedPassword,
+      email,
+    });
 
-  res.cookie('token', token, {
-    httpOnly: true,
-  });
+    // Generate token
+    const token = generateToken(newUser.id);
+    res.cookie('token', token, {
+      httpOnly: true,
+    });
 
-  // Send response
-  res.status(200).send({ success: true });
+    // Send response
+    res.status(200).send({ success: true });
+  } catch (err) {
+    res.status(500).send({ error: err });
+    return;
+  }
 };

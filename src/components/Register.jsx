@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useReducer } from 'react';
 import { styled } from 'styletron-react';
 import TextInput from './Form/TextInput';
 import colors from '../constants/colors';
@@ -6,9 +6,8 @@ import Surface from './Surface';
 import Button from './Form/Button';
 import Title from './form/Title';
 import useNotifications from '../hooks/useNotifications';
-
-const userNameRegex = /^[a-zA-Z0-9_]{3,24}$/;
-const passwordRegex = /^.{8,64}$/;
+import { usernameRegex, passwordRegex, emailRegex } from '../util/validation';
+import { initialState, reducer } from '../state/forms/register';
 
 const Container = styled('div', {
   display: 'flex',
@@ -24,11 +23,11 @@ const Form = styled('form', {
   width: '100%',
 });
 
-const registerUser = async ({ username, password }) => {
+const registerUser = async ({ username, password, email }) => {
   const response = await fetch('/api/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password }),
+    body: JSON.stringify({ username, password, email }),
   });
   const data = await response.json();
 
@@ -36,15 +35,12 @@ const registerUser = async ({ username, password }) => {
 };
 
 export default () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [formState, dispatchFormAction] = useReducer(reducer, initialState);
+  const { username, password, email } = formState;
   const { add: addNotification } = useNotifications();
 
-  const onUsernameChange = (e) => {
-    setUsername(e.target.value);
-  };
-  const onPasswordChange = (e) => {
-    setPassword(e.target.value);
+  const onFormChange = ({ target }) => {
+    dispatchFormAction({ type: `SET_${target.name}`, payload: target.value });
   };
 
   const validate = () => {
@@ -66,7 +62,7 @@ export default () => {
       return;
     }
 
-    const response = await registerUser({ username, password });
+    const response = await registerUser({ username, password, email });
 
     if (response.success) {
       alert('Success!');
@@ -86,8 +82,18 @@ export default () => {
             required
             minLength="3"
             maxLength="24"
-            pattern={userNameRegex}
-            onChange={onUsernameChange}
+            pattern={usernameRegex}
+            onChange={onFormChange}
+          />
+          <TextInput
+            name="Email"
+            type="email"
+            value={email}
+            required
+            minLength="3"
+            maxLength="24"
+            pattern={emailRegex}
+            onChange={onFormChange}
           />
           <TextInput
             name="Password"
@@ -96,7 +102,7 @@ export default () => {
             minLength="8"
             maxLength="64"
             pattern={passwordRegex}
-            onChange={onPasswordChange}
+            onChange={onFormChange}
           />
         </Surface>
         <Button type="submit" onClick={onSubmit}>

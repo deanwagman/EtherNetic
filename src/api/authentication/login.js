@@ -14,7 +14,7 @@ export const post = async (req, res) => {
   }
 
   // Get user
-  const user = await getUsername(username);
+  const user = await db.User.findOne({ where: { username } });
 
   if (!user) {
     res.status(400).send({ error: 'User does not exist' });

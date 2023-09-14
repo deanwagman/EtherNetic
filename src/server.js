@@ -19,7 +19,7 @@ import webpackConfig from '../webpack.config';
 import Document from './components/Document';
 
 import App from './App';
-import db from './db/';
+// import db from './db/';
 import authMiddleware from './middleware/authentication';
 import routes from './routes/routes';
 import { getStaticRouter } from './routes/router';
@@ -34,6 +34,10 @@ import simulateFineTune from './api/fine-tune/simulate';
 import createPrompt from './api/prompts/create';
 
 import autoComplete from './api/chat/autoComplete';
+
+import db from './db';
+
+db.sequelize.sync();
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -87,6 +91,14 @@ app.get('*', async (req, res) => {
   res.send(renderToString(<Document styles={styles} html={html} />));
 });
 
-app.listen(port, () => {
+app.listen(port, async () => {
   console.log(`App listening on port ${port}`);
+
+  try {
+    await db.sequelize.sync({ force: true });
+    console.log('Database synced');
+  } catch (err) {
+    console.log('Error syncing database');
+    console.log(err);
+  }
 });
