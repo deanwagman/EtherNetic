@@ -38,7 +38,11 @@ const Button = styled('button', {
   fontFamily: '"Open Sans", sans-serif',
 });
 
-export default ({ onChange = () => {}, ...otherProps }) => {
+export default ({
+  onChange = () => {},
+  value: initialValue,
+  ...otherProps
+}) => {
   const { value, request } = useAutoComplete();
   const [input, setInput] = useState('');
   const textAreaRef = useRef(null);
@@ -52,7 +56,9 @@ export default ({ onChange = () => {}, ...otherProps }) => {
     onChange(value);
   }, [value]);
 
-  console.log({ otherProps });
+  useEffect(() => {
+    setInput(initialValue);
+  }, [initialValue]);
 
   return (
     <Container>

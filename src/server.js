@@ -19,7 +19,6 @@ import webpackConfig from '../webpack.config';
 import Document from './components/Document';
 
 import App from './App';
-// import db from './db/';
 import authMiddleware from './middleware/authentication';
 import routes from './routes/routes';
 import { getStaticRouter } from './routes/router';
@@ -32,6 +31,10 @@ import chatMessage from './api/chat/message';
 import simulateFineTune from './api/fine-tune/simulate';
 
 import createPrompt from './api/prompts/create';
+import getPrompts from './api/prompts/getAll';
+import deletePrompt from './api/prompts/delete';
+import updatePrompt from './api/prompts/update';
+import getPrompt from './api/prompts/get';
 
 import autoComplete from './api/chat/autoComplete';
 
@@ -71,6 +74,10 @@ app.route('/api/fine-tune/simulate').post(simulateFineTune);
 app.route('/api/auto-complete').post(autoComplete);
 
 app.route('/api/prompts/create').post(createPrompt);
+app.route('/api/prompts').get(getPrompts);
+app.route('/api/prompts/:id').delete(deletePrompt);
+app.route('/api/prompts/:id').put(updatePrompt);
+app.route('/api/prompts/:id').get(getPrompt);
 
 // Serve the SPA on every route
 app.get('*', async (req, res) => {
@@ -95,7 +102,7 @@ app.listen(port, async () => {
   console.log(`App listening on port ${port}`);
 
   try {
-    await db.sequelize.sync({ force: true });
+    await db.sequelize.sync();
     console.log('Database synced');
   } catch (err) {
     console.log('Error syncing database');

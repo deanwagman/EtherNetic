@@ -30,6 +30,7 @@ const Notification = styled('li', ({ id }) => ({
   position: 'relative',
   ...colorShift,
   viewTransitionName: `notification-${id}`,
+  backdropFilter: `blur(10px)`
 }));
 
 const Close = styled('button', {
@@ -64,8 +65,6 @@ export default () => {
 
     return () => clearTimeout(timeout);
   }, [notifications]);
-
-  console.log({ notifications });
 
   return (
     <Container>

@@ -7,7 +7,7 @@ const REMOVE_NOTIFICATION = 'REMOVE_NOTIFICATION';
 const createNotification = ({ message, duration }) => ({
   id: Date.now(),
   message,
-  duration: 5000,
+  duration,
 });
 
 const initialState = {

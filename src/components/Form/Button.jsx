@@ -21,6 +21,12 @@ const Button = styled('button', {
     cursor: 'pointer',
     transform: `scale(1.05)`,
   },
+
+  // ':focus': {
+  //   backdropFilter: 'hue-rotate(180deg)',
+  //   boxShadow: 'rgba(255,255,255,0.5) 0px 0px 80px',
+  //   transform: `scale(1.05)`,
+  // },
 });
 
 export default (props) => {

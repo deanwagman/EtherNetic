@@ -5,6 +5,15 @@ import { colorShift } from '../../util/styles';
 import colors from '../../constants/colors';
 import viewTransition from '../../util/viewTransitions';
 
+const NavLink = styled('a', {
+  color: colors.etherealMistWhite,
+  textDecoration: 'none',
+  fontSize: '1em',
+  fontFamily: '"Raleway", sans-serif',
+  textShadow: '0 0 10px rgba(0,0,0,0.5))',
+  cursor: 'pointer',
+});
+
 const TransitionLink = ({ to, children }) => {
   const navigate = useNavigate();
 
@@ -12,7 +21,7 @@ const TransitionLink = ({ to, children }) => {
     viewTransition(() => navigate(to));
   };
 
-  return <div onClick={onClick}>{children}</div>;
+  return <NavLink onClick={onClick}>{children}</NavLink>;
 };
 
 const Nav = styled('nav', {
@@ -52,14 +61,6 @@ const Logo = styled('h1', {
   animationIterationCount: 'infinite',
 });
 
-const NavLink = styled(TransitionLink, {
-  color: colors.etherealMistWhite,
-  textDecoration: 'none',
-  fontSize: '1em',
-  fontFamily: '"Raleway", sans-serif',
-  textShadow: '0 0 10px rgba(0,0,0,0.5))',
-});
-
 const AncillaryNav = styled('div', {
   display: 'flex',
   justifyContent: 'center',
@@ -74,8 +75,10 @@ export default () => {
         <Logo>EtherNetic</Logo>
       </Link>
       <AncillaryNav>
-        <NavLink to="/login">Login</NavLink>
-        <NavLink to="/register">Register</NavLink>
+        <TransitionLink to="/login">Login</TransitionLink>
+        <TransitionLink to="/register">Register</TransitionLink>
+        <TransitionLink to="/create-prompt">Create prompt</TransitionLink>
+        <TransitionLink to="/view-prompts">View Prompts</TransitionLink>
       </AncillaryNav>
     </Nav>
   );

@@ -5,6 +5,8 @@ import Register from '../components/Register';
 import Etherboard from '../components/Etherboard';
 import EtherTome from '../components/EtherTome';
 import CreatePrompt from '../components/EtherTome/prompts/CreatePrompt';
+import ViewPrompts from '../components/EtherTome/prompts/ViewPrompts';
+import EditPrompt from '../components/EtherTome/prompts/EditPrompt';
 
 export default [
   {
@@ -28,8 +30,16 @@ export default [
         element: <Etherboard />,
       },
       {
-        path: 'createprompt',
+        path: 'create-prompt',
         element: <CreatePrompt />,
+      },
+      {
+        path: 'view-prompts',
+        element: <ViewPrompts />,
+      },
+      {
+        path: 'edit-prompt/:id',
+        element: <EditPrompt />,
       },
     ],
   },

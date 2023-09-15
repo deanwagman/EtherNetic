@@ -1,28 +1,8 @@
-// This is from previous db implementation, remove after migration
-
-// import { config } from 'dotenv';
-// config();
-
-// import { Pool } from 'pg';
-
-// const { DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_DATABASE } = process.env;
-
-// const pool = new Pool({
-//   host: DB_HOST,
-//   user: DB_USER,
-//   database: DB_DATABASE,
-//   password: DB_PASSWORD,
-//   port: DB_PORT,
-// });
-
-// export default {
-//   query: (text, params) => pool.query(text, params),
-// };
-
 import { config } from 'dotenv';
 import Sequelize from 'sequelize';
 
 import UserModel from './models/User';
+import PromptModel from './models/Prompt';
 
 config();
 
@@ -38,6 +18,7 @@ const sequelize = new Sequelize(
   );
   
 db.User = UserModel(sequelize, Sequelize.DataTypes);
+db.Prompt = PromptModel(sequelize, Sequelize.DataTypes);
 
 Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {

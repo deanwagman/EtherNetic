@@ -1,7 +1,6 @@
 import bcrypt from 'bcrypt';
 import db from '../../db';
 import { generate as generateToken } from '../../util/jwt';
-import getUsername from '../../db/users/getUsername';
 
 export const post = async (req, res) => {
   const { body } = req;

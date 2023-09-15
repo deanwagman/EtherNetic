@@ -1,15 +1,38 @@
-import React, { useReducer } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import { styled } from 'styletron-react';
+import { useParams } from 'react-router-dom';
 import colors from '../../../constants/colors';
 import TextInput from '../../Form/TextInput';
 import TextAreaWithGPT from '../../Form/TextAreaWithGPT';
 import TextArea from '../../Form/TextArea';
+import FormTitle from '../../Form/Title';
 import OptionButton from '../../Form/OptionButton';
 import FormButton from '../../Form/Button';
-import SubTitle from '../../Form/SubTitle';
-import FormTitle from '../../Form/Title';
 import Surface from '../../Surface';
 import useNotifications from '../../../hooks/useNotifications';
+
+const initialState = {
+  title: '',
+  prompt: '',
+  category: '',
+};
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'title':
+      return { ...state, title: action.payload };
+    case 'category':
+      return { ...state, category: action.payload };
+    case 'prompt':
+      return { ...state, prompt: action.payload };
+    case 'reset':
+      return { ...initialState };
+    case 'set':
+      return { ...state, ...action.payload };
+    default:
+      return state;
+  }
+};
 
 const Container = styled('div', {
   display: 'flex',
@@ -30,66 +53,69 @@ const Form = styled('form', {
   maxWidth: '100ch',
 });
 
-const initialState = {
-  title: '',
-  prompt: '',
-  category: '',
-};
-
-const reducer = (state, action) => {
-  switch (action.type) {
-    case 'title':
-      return { ...state, title: action.payload };
-    case 'category':
-      return { ...state, category: action.payload };
-    case 'prompt':
-      return { ...state, prompt: action.payload };
-    case 'reset':
-      return { ...initialState };
-    default:
-      return state;
-  }
-};
-
 export default () => {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const { id } = useParams();
   const { add: addNotification } = useNotifications();
   const { title, prompt, category } = state;
   const handleChange = (e) => {
     dispatch({ type: e.target.name, payload: e.target.value });
   };
-  const resetForm = () => {
-    dispatch({ type: 'reset' });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await fetch('/api/prompts/create', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, prompt, category }),
-    });
+    try {
+      // update prompt
+      const response = await fetch(`/api/prompts/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title,
+          prompt,
+          category,
+        }),
+      });
 
-    const body = await response.json();
+      const data = await response.json();
 
-    if (body.error) {
-      addNotification(body.error);
-      return;
-    }
+      if (data.success) {
+        addNotification({
+          message: 'Prompt updated successfully',
+        });
+      }
 
-    if (body) {
-      const { title } = body;
-      const message = `Successfully created prompt: ${title}`;
-      addNotification({ message });
-      resetForm();
+      // reset form
+      dispatch({ type: 'set', payload: data });
+
+      addNotification({
+        message: 'Prompt updated successfully',
+      });
+    } catch (error) {
+      addNotification({
+        message: 'Error updating prompt',
+      });
     }
   };
+
+  useEffect(() => {
+    try {
+      (async () => {
+        const response = await fetch(`/api/prompts/${id}`);
+        const data = await response.json();
+        dispatch({ type: 'set', payload: data });
+      })();
+    } catch (error) {
+      addNotification({
+        message: 'Error loading prompt',
+      });
+    }
+  }, []);
 
   return (
     <Container>
       <Form onSubmit={handleSubmit}>
-        <FormTitle>Create a Prompt</FormTitle>
+        <FormTitle>Update Prompt</FormTitle>
         <Surface style={{ width: '100%', maxWidth: '100ch' }}>
           <TextInput
             name="title"
@@ -113,7 +139,7 @@ export default () => {
             $style={{ height: '30em' }}
           />
         </Surface>
-        <FormButton>Create Prompt</FormButton>
+        <FormButton>Update Prompt</FormButton>
       </Form>
     </Container>
   );
