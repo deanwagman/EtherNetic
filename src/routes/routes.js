@@ -22,10 +22,6 @@ export default [
         element: <Register />,
       },
       {
-        path: 'ethertome',
-        element: <EtherTome />,
-      },
-      {
         path: 'etherboard',
         element: <Etherboard />,
       },
@@ -41,6 +37,10 @@ export default [
         path: 'edit-prompt/:id',
         element: <EditPrompt />,
       },
+      {
+        path: 'simulated-conversations',
+        element: <EtherTome />,
+      }
     ],
   },
 ];

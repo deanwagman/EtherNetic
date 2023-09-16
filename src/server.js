@@ -35,6 +35,7 @@ import getPrompts from './api/prompts/getAll';
 import deletePrompt from './api/prompts/delete';
 import updatePrompt from './api/prompts/update';
 import getPrompt from './api/prompts/get';
+import getPromptOptions from './api/prompts/getOptions';
 
 import autoComplete from './api/chat/autoComplete';
 
@@ -74,6 +75,7 @@ app.route('/api/fine-tune/simulate').post(simulateFineTune);
 app.route('/api/auto-complete').post(autoComplete);
 
 app.route('/api/prompts/create').post(createPrompt);
+app.route('/api/prompts/options').get(getPromptOptions);
 app.route('/api/prompts').get(getPrompts);
 app.route('/api/prompts/:id').delete(deletePrompt);
 app.route('/api/prompts/:id').put(updatePrompt);

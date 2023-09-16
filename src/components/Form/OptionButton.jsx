@@ -43,12 +43,10 @@ const Container = styled('label', ({ active }) => ({
 const Checkbox = styled('input', visuallyHidden);
 
 export default ({ value, name, ...otherProps }) => {
-  const uuid = useId();
-
   return (
-    <Container htmlFor={uuid} active={value}>
+    <Container active={value}>
       {name}
-      <Checkbox id={uuid} type="checkbox" value={value} {...otherProps} />
+      <Checkbox type="checkbox" value={value} {...otherProps} />
     </Container>
   );
 };

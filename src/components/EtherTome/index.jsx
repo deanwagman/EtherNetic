@@ -1,4 +1,4 @@
-import React, { useState, useReducer } from 'react';
+import React, { useState, useReducer, useEffect } from 'react';
 import { styled } from 'styletron-react';
 import Surface from '../Surface';
 import Title from '../Form/Title';
@@ -8,13 +8,10 @@ import NumberInput from '../Form/Number';
 import FormButton from '../Form/Button';
 import OptionButton from '../Form/OptionButton';
 import useChatGPT from '../../hooks/useChatGPT';
-import guides from '../../prompts/guides';
 import viewTransition from '../../util/viewTransitions';
 import SimulatedConversations from './SimulatedConversations';
 
 import Loading from '../Loading';
-
-const availableGuideIds = Object.keys(guides);
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -22,12 +19,17 @@ const reducer = (state, action) => {
       return { ...state, topic: action.payload };
     case 'numberOfMessages':
       return { ...state, numberOfMessages: action.payload };
-    case 'guideIds-add':
-      return { ...state, guideIds: [...state.guideIds, action.payload] };
-    case 'guideIds-remove':
+    case 'selectedPromptOptions-add':
       return {
         ...state,
-        guideIds: state.guideIds.filter((id) => id !== action.payload),
+        selectedPromptOptions: [...state.selectedPromptOptions, action.payload],
+      };
+    case 'selectedPromptOptions-remove':
+      return {
+        ...state,
+        selectedPromptOptions: state.selectedPromptOptions.filter(
+          (id) => id !== action.payload,
+        ),
       };
     default:
       return state;
@@ -55,21 +57,22 @@ const Form = styled('form', {
 export default () => {
   const [simulatedConversations, setSimulatedConversations] = useState([]);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [promptOptions, setPromptOptions] = useState([]);
   const [state, dispatch] = useReducer(reducer, {
     topic: '',
     numberOfMessages: 5,
-    guideIds: ['default'],
+    selectedPromptOptions: [],
   });
-  const { topic, numberOfMessages, guideIds } = state;
+  const { topic, numberOfMessages, selectedPromptOptions } = state;
 
   const onTopicChange = (e) =>
     dispatch({ type: 'topic', payload: e.target.value });
   const onNumberOfMessagesChange = (e) =>
     dispatch({ type: 'numberOfMessages', payload: e.target.value });
-  const onGuideIdsChange = (guideId) =>
-    guideIds.includes(guideId)
-      ? dispatch({ type: 'guideIds-remove', payload: guideId })
-      : dispatch({ type: 'guideIds-add', payload: guideId });
+  const onPromptOptionChange = (id) =>
+    selectedPromptOptions.includes(id)
+      ? dispatch({ type: 'selectedPromptOptions-remove', payload: id })
+      : dispatch({ type: 'selectedPromptOptions-add', payload: id });
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -83,7 +86,7 @@ export default () => {
       body: JSON.stringify({
         topic,
         numberOfMessages,
-        guideIds,
+        promptIds: selectedPromptOptions,
       }),
     });
     const reader = response.body.getReader();
@@ -123,6 +126,20 @@ export default () => {
     viewTransition(() => setIsStreaming(false));
   };
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await fetch('/api/prompts/options');
+        const data = await response.json();
+
+        console.log({ data });
+        setPromptOptions(data);
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+  }, []);
+
   if (simulatedConversations.length) {
     const onApprove = (id) =>
       viewTransition(() => {
@@ -159,12 +176,12 @@ export default () => {
           <Surface $style={{ padding: '2em' }}>
             <Label as="h2">AI Prompts</Label>
             <div>
-              {availableGuideIds.map((guideId) => (
+              {promptOptions.map(({ id, title }) => (
                 <OptionButton
-                  key={guideId}
-                  name={guideId}
-                  value={guideIds.includes(guideId)}
-                  onChange={() => onGuideIdsChange(guideId)}
+                  key={id}
+                  name={title}
+                  value={selectedPromptOptions.includes(id)}
+                  onChange={() => onPromptOptionChange(id)}
                 />
               ))}
             </div>

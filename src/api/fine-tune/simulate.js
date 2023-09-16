@@ -1,27 +1,23 @@
+import db from '../../db';
 import { createParser } from 'eventsource-parser';
 import getSimulatePrompt from '../../prompts/fine-tune/simulate';
-import guides from '../../prompts/guides';
-
-const {
-  lore,
-  worldBuilding,
-  fineTune,
-  elementalSpirits,
-  easterEggs,
-  specialEvents,
-  spirits,
-} = guides;
-
-const guideNames = Object.keys(guides);
 
 export default async (request, response) => {
-  const { guideIds, numberOfMessages, topic } = request.body;
-  const guidePrompts = guideIds.map((id) => guides[id]).join('\n\n');
+  const { promptIds, numberOfMessages, topic } = request.body;
+  const prompts = await db.Prompt.findAll({
+    where: {
+      id: promptIds,
+    },
+  });
+  const concisePrompts = prompts.reduce(
+    (accumlator, { prompt }) => [accumlator, prompt].join('\n'),
+    ``,
+  );
   const simulatePrompt = getSimulatePrompt({ numberOfMessages, topic });
 
-  const guideSystemMessage = {
+  const promptSystemMessage = {
     role: 'system',
-    content: guidePrompts,
+    content: concisePrompts,
   };
   const simulateMessage = {
     role: 'user',
@@ -44,14 +40,12 @@ export default async (request, response) => {
         method: 'POST',
         body: JSON.stringify({
           model: 'gpt-4',
-          messages: [guideSystemMessage, simulateMessage],
+          messages: [promptSystemMessage, simulateMessage],
           stream: true,
           n: 1,
         }),
       },
     );
-
-    console.log({ headers: openAiResponse.headers });
 
     if (!openAiResponse.ok) {
       response
@@ -78,8 +72,6 @@ export default async (request, response) => {
       try {
         const json = JSON.parse(data);
         const text = json.choices[0].delta?.content || '';
-
-        console.log(text);
 
         response.write(encoder.encode(text));
       } catch (error) {
