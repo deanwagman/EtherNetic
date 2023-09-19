@@ -10,6 +10,7 @@ import OptionButton from '../Form/OptionButton';
 import useChatGPT from '../../hooks/useChatGPT';
 import viewTransition from '../../util/viewTransitions';
 import SimulatedConversations from './SimulatedConversations';
+import useGetPromptOptions from '../../hooks/useGetPromptOptions';
 
 import Loading from '../Loading';
 
@@ -57,12 +58,13 @@ const Form = styled('form', {
 export default () => {
   const [simulatedConversations, setSimulatedConversations] = useState([]);
   const [isStreaming, setIsStreaming] = useState(false);
-  const [promptOptions, setPromptOptions] = useState([]);
   const [state, dispatch] = useReducer(reducer, {
     topic: '',
     numberOfMessages: 5,
     selectedPromptOptions: [],
   });
+  const promptOptions = useGetPromptOptions();
+
   const { topic, numberOfMessages, selectedPromptOptions } = state;
 
   const onTopicChange = (e) =>
@@ -125,20 +127,6 @@ export default () => {
 
     viewTransition(() => setIsStreaming(false));
   };
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const response = await fetch('/api/prompts/options');
-        const data = await response.json();
-
-        console.log({ data });
-        setPromptOptions(data);
-      } catch (e) {
-        console.error(e);
-      }
-    })();
-  }, []);
 
   if (simulatedConversations.length) {
     const onApprove = (id) =>

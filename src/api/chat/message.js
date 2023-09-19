@@ -1,7 +1,26 @@
+import db from '../../db';
 import { createParser } from 'eventsource-parser';
 
+const createMessage = ({ role, content = '' }) => ({
+  role,
+  content,
+});
+
+const adaptSystemMessage = (message) =>
+  createMessage({
+    role: 'system',
+    content: message,
+  });
+
 export default async (request, response) => {
-  const { messages } = request.body;
+  const { messages, promptIds } = request.body;
+
+  console.log({ messages, promptIds });
+
+  if (!messages) {
+    response.status(400).send({ message: 'Messages are missing.' });
+    return;
+  }
 
   if (!process.env.OPENAI_API_KEY) {
     response.status(500).send({ message: 'OpenAI API key is missing.' });
@@ -9,6 +28,17 @@ export default async (request, response) => {
   }
 
   try {
+    const prompts = await db.Prompt.findAll({
+      where: {
+        id: promptIds,
+      },
+      attributes: ['prompt'],
+    });
+
+    const systemMessage = adaptSystemMessage(
+      prompts.map(({ prompt }) => prompt).join('\n'),
+    );
+
     const openAiResponse = await fetch(
       'https://api.openai.com/v1/chat/completions',
       {
@@ -19,7 +49,7 @@ export default async (request, response) => {
         method: 'POST',
         body: JSON.stringify({
           model: 'gpt-4',
-          messages: [...messages],
+          messages: [systemMessage, ...messages],
           stream: true,
           n: 1,
         }),
@@ -65,8 +95,6 @@ export default async (request, response) => {
     for await (const chunk of openAiResponse.body) {
       parser.feed(decoder.decode(chunk));
     }
-
-    parser.end();
   } catch (error) {
     console.error(error);
     response.status(500).send({ message: error.message });

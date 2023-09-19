@@ -5,25 +5,27 @@ import useTyping from '../../hooks/useTyping';
 const spiritTypingSpeed = 70;
 
 const Text = styled('p', {
-  fontSize: '1em',
+  fontSize: '1.5em',
   lineHeight: '1.5em',
   color: 'rgba(255,255,255,0.6)',
   textShadow: '0px 0px 8px rgba(0,0,0,0.3)',
   fontFamily: '"Cinzel", serif',
-  margin: 0,
   padding: 0,
-  marginBottom: '2em',
+  marginBottom: '4em',
   textAlign: 'start',
-  ':first-child': {
-    marginBlockStart: 'calc(100vh - 100%)',
-  },
-  ':last-child': {
-    marginBlockEnd: 'calc(100vh - 100%)',
-  },
+
+  // Break on new lines
+  whiteSpace: 'pre-wrap',
+  // ':first-child': {
+  //   marginBlockStart: 'calc(100vh - 100%)',
+  // },
+  // ':last-child': {
+  //   marginBlockEnd: 'calc(100vh - 100%)',
+  // },
 });
 
 export default ({ text }) => {
-  const currentText = useTyping({ text, speed: spiritTypingSpeed });
+  // const currentText = useTyping({ text, speed: spiritTypingSpeed });
 
-  return <Text>{currentText}</Text>;
+  return <Text>{text}</Text>;
 };

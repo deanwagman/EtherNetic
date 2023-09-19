@@ -3,11 +3,11 @@ import { styled } from 'styletron-react';
 import colors from '../../constants/colors';
 
 const Form = styled('form', {
-  margin: '3em 0',
+  margin: '1em 0',
+  position: 'relative', // For the submit button
 });
 
 const SubmitButton = styled('button', {
-  width: '100%',
   background: 'transparent',
   border: 'none',
   outline: 'none',
@@ -16,6 +16,28 @@ const SubmitButton = styled('button', {
   color: colors.etherealMistWhite,
   fontFamily: '"Open Sans", sans-serif',
   textAlign: 'end',
+  cursor: 'pointer',
+  position: 'absolute',
+  top: 0,
+  right: '-3em',
+  display: 'inline-block',
+  ':focus': {
+    outline: 'rgba(255,255,255,0.7) auto 1px',
+    animationName: {
+      '0%': {
+        opacity: 0.5,
+      },
+      '50%': {
+        opacity: 0.75,
+      },
+      '100%': {
+        opacity: 0.5,
+      },
+    },
+    animationDuration: '2s',
+    animationIterationCount: 'infinite',
+    animationTimingFunction: 'ease-in-out',
+  },
 });
 
 const TextArea = styled('textarea', {
@@ -29,12 +51,29 @@ const TextArea = styled('textarea', {
   color: colors.etherealMistWhite,
   fontFamily: '"Open Sans", sans-serif',
   textAlign: 'end',
+  '::placeholder': {
+    color: 'rgba(255,255,255,0.6)',
+  },
+  ':empty': {
+    animationDuration: '2s',
+    animationIterationCount: 'infinite',
+    animationTimingFunction: 'ease-in-out',
+    animationName: {
+      '0%': {
+        opacity: 0.5,
+      },
+      '50%': {
+        opacity: 0.75,
+      },
+      '100%': {
+        opacity: 0.5,
+      },
+    },
+  },
 });
 
-export default () => {
+export default ({ onSubmit = () => {} }) => {
   const [text, setText] = useState('');
-  const ref = useRef(null);
-  const focus = () => ref.current?.focus();
 
   const handleChange = (e) => {
     setText(e.target.value);
@@ -42,23 +81,20 @@ export default () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    onSubmit(text);
     setText('');
   };
-
-  useEffect(() => {
-    focus();
-  }, [ref]);
 
   return (
     <Form onSubmit={handleSubmit}>
       <TextArea
-        placeholder="How is there?"
+        placeholder="Who is there?"
         value={text}
         onChange={handleChange}
-        rows="5"
-        ref={ref}
+        rows="1"
+        autoFocus={true}
       />
-      <SubmitButton type="submit">Send</SubmitButton>
+      <SubmitButton type="submit">✉️</SubmitButton>
     </Form>
   );
 };

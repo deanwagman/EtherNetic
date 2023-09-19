@@ -3,12 +3,12 @@ import { styled } from 'styletron-react';
 import colors from '../../constants/colors';
 
 const Text = styled('p', {
-  fontSize: '1em',
+  fontSize: '1.5em',
   lineHeight: '1.5em',
   color: colors.ancientParchment,
   fontFamily: '"Space Mono", monospace',
   marginBottom: '2em',
-  padding: '0 3em',
+  padding: '2em 1em',
   textAlign: 'center',
   textWrap: 'balance',
   opacity: 0.6,

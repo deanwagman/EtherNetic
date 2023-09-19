@@ -6,4 +6,5 @@ export default styled('h1', {
   color: '#fff',
   textShadow: '0 0 10px rgba(0,0,0,0.5))',
   paddingBottom: '1em',
+  viewTransitionName: 'form-title',
 });

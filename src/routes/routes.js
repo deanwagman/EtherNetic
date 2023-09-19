@@ -7,6 +7,8 @@ import EtherTome from '../components/EtherTome';
 import CreatePrompt from '../components/EtherTome/prompts/CreatePrompt';
 import ViewPrompts from '../components/EtherTome/prompts/ViewPrompts';
 import EditPrompt from '../components/EtherTome/prompts/EditPrompt';
+import RainingImage from '../components/RainingImage';
+import Terminal from '../components/Terminal';
 
 export default [
   {
@@ -40,6 +42,14 @@ export default [
       {
         path: 'simulated-conversations',
         element: <EtherTome />,
+      },
+      {
+        path: 'raining-image',
+        element: <RainingImage />,
+      },
+      {
+        path: 'terminal',
+        element: <Terminal />,
       }
     ],
   },

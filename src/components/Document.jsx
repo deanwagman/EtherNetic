@@ -41,6 +41,7 @@ export default ({ html, styles }) => (
     </head>
     <body>
       <div id="root" dangerouslySetInnerHTML={{ __html: html }} />
+      <div id="modal-root" />
       <script type="text/javascript" src="/dist/bundle.js" defer></script>
     </body>
   </html>

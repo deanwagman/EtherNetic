@@ -79,8 +79,11 @@ export default () => {
         <TransitionLink to="/register">Register</TransitionLink>
         <TransitionLink to="/create-prompt">Create prompt</TransitionLink>
         <TransitionLink to="/view-prompts">View Prompts</TransitionLink>
+        <TransitionLink to="/edit-prompt">Edit Prompts</TransitionLink>
         <TransitionLink to="/simulated-conversations">Simulate</TransitionLink>
         <TransitionLink to="/etherboard">EtherBoard</TransitionLink>
+        <TransitionLink to="/terminal">Terminal</TransitionLink>
+        {/* <TransitionLink to="/raining-image">💧</TransitionLink> */}
       </AncillaryNav>
     </Nav>
   );

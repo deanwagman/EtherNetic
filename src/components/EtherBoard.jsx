@@ -13,7 +13,7 @@ const Container = styled('div', {
   flexDirection: 'column',
   padding: '0 5em',
   width: '100%',
-  maxWidth: '100ch',
+  maxWidth: '120ch',
   margin: '0 auto',
   height: '100%',
   overflowY: 'auto',
@@ -41,11 +41,10 @@ export default () => {
   const lastIndex = simulatedGameplayMessages.length - 1;
 
   useEffect(() => {
-    console.log({ currentIndex, lastIndex });
     const timeout = setTimeout(() => {
       setSome([...some, simulatedGameplayMessages[currentIndex]]);
       setCurrentIndex(currentIndex + 1);
-    }, 8000);
+    }, 10000);
 
     return () => setTimeout(timeout);
   }, [currentIndex, some]);
@@ -53,8 +52,6 @@ export default () => {
   useEffect(() => {
     // Scroll to bottom
     const bottom = containerRef.current?.scrollHeight;
-
-    console.log({ bottom, containerRef });
 
     containerRef.current?.scrollTo({ top: bottom, behavior: 'smooth' });
   }, [some]);

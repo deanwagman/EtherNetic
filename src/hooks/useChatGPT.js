@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useId } from 'react';
+import viewTransition from '../util/viewTransitions';
 
 const createMessage = ({ role, content = '' }) => ({
   id: Date.now(),
@@ -28,14 +29,16 @@ const shouldSendMessages = (messages) => {
   return lastMessageSenderRole === 'user';
 };
 
-const useChatGPT = (type) => {
+const useChatGPT = (promptIds = []) => {
   const [messages, setMessages] = useState([]);
   const [isRequesting, setIsRequesting] = useState(false);
 
   const addSystemMessage = (message) =>
     setMessages([...messages, adaptSystemMessage(message)]);
-  const addUserMessage = (message) =>
-    setMessages([...messages, adaptUserMessage(message)]);
+  const addUserMessage = (message) => {
+    console.log('adding user message', message);
+    return setMessages([...messages, adaptUserMessage(message)]);
+  };
   const addAssistantMessage = (message) => {
     setMessages([...messages, adaptAssistantMessage(message)]);
   };
@@ -45,8 +48,10 @@ const useChatGPT = (type) => {
     messages.map(({ content, role }) => ({ role, content }));
 
   const updateMessage = (id, updateFn = () => {}) => {
+    console.log('updating message', id);
     setMessages((prev) =>
       prev.map((message) => {
+        console.log({ message });
         if (message.id === id) {
           return { ...message, content: updateFn(message.content) };
         }
@@ -55,13 +60,15 @@ const useChatGPT = (type) => {
     );
   };
 
-  const request = async () => {
-    const endpoint = type === 'fine-tune' ? '/api/fine-tune/simulate' : '/api/message';
+  const request = async (value) => {
+    const endpoint = '/api/message';
+    const userMessage = adaptUserMessage(value);
 
+    setMessages((messages) => [...messages, userMessage]);
     setIsRequesting(true);
 
     const decoder = new TextDecoder();
-    const adaptedMessages = adaptMessagesForApi(messages);
+    const adaptedMessages = adaptMessagesForApi([...messages, userMessage]);
 
     try {
       const response = await fetch(endpoint, {
@@ -69,16 +76,16 @@ const useChatGPT = (type) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: adaptedMessages,
-          guideName: type === 'fine-tune' ? 'fineTune' : '',
+          promptIds: promptIds || [],
         }),
       });
       const reader = response.body.getReader();
 
-      const newMessage = createMessage({ role: 'assistant' });
+      const assistantMessage = adaptAssistantMessage('');
 
       setIsRequesting(false);
 
-      setMessages([...messages, newMessage]);
+      setMessages((messages) => [...messages, assistantMessage]);
 
       let buffer = '';
       while (true) {
@@ -90,7 +97,9 @@ const useChatGPT = (type) => {
 
         const text = decoder.decode(value);
 
-        updateMessage(newMessage.id, (prevText) => prevText + text);
+        console.log({ text, assistantMessage, messages });
+
+        updateMessage(assistantMessage.id, (prevText) => prevText + text);
       }
     } catch (error) {
       setIsRequesting(false);
@@ -98,13 +107,13 @@ const useChatGPT = (type) => {
     }
   };
 
+  const send = (value) => viewTransition(() => request(value));
+  const clear = () => viewTransition(clearMessages);
+
   return {
     messages,
-    addUserMessage,
-    addAssistantMessage,
-    addSystemMessage,
-    clearMessages,
-    send: request,
+    send,
+    clear,
   };
 };
 

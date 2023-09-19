@@ -15,6 +15,7 @@ const Button = styled('button', {
   fontFamily: '"Raleway", sans-serif',
   marginTop: '2em',
   transition: 'all 0.2s ease-in-out',
+  viewTransitionName: 'form-button',
   ':hover': {
     backdropFilter: 'hue-rotate(180deg)',
     boxShadow: 'rgba(255,255,255,0.5) 0px 0px 80px',

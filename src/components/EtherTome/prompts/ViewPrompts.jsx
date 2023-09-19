@@ -6,6 +6,7 @@ import Loading from '../../Loading';
 import colors from '../../../constants/colors';
 import useNotifications from '../../../hooks/useNotifications';
 import viewTransition from '../../../util/viewTransitions';
+import Modal from '../../Modal';
 
 const Container = styled('div', {
   height: '100%',
@@ -81,6 +82,9 @@ const Button = styled('button', {
 
 const ViewPrompts = ({ children }) => {
   const [prompts, setPrompts] = useState([]);
+  const [showTestModal, setShowTestModal] = useState(false);
+  const onCloseTestModal = () => viewTransition(() => setShowTestModal(false));
+  const onOpenTestModal = () => viewTransition(() => setShowTestModal(true));
   const { add: addNotification } = useNotifications();
   const navigate = useNavigate();
   const editPrompt = (id) => {
@@ -143,6 +147,7 @@ const ViewPrompts = ({ children }) => {
                     <Button onClick={() => deletePrompt(prompt.id)}>
                       Delete
                     </Button>
+                    <Button onClick={onOpenTestModal}>Test</Button>
                   </ButtonContainer>
                 </Cell>
               </Row>
@@ -150,6 +155,19 @@ const ViewPrompts = ({ children }) => {
           </tbody>
         </Table>
       )}
+
+      {showTestModal ? (
+        <Modal
+          onClose={onCloseTestModal}
+          options={[
+            { label: 'cancel', onClick: () => {} },
+            { label: 'ok', onClick: () => {} },
+          ]}
+        >
+          If it hadn't been for Cotton-Eye Joe, I'd been married a long time
+          ago.
+        </Modal>
+      ) : null}
     </Container>
   );
 };

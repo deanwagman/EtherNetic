@@ -5,8 +5,9 @@ const UserInput = ({ onSubmit = () => {} }) => {
   const inputRef = useRef({ focus: () => {} });
 
   const onClick = () => {
-    setMessage('');
     onSubmit(message);
+    setMessage('');
+    console.log({ message });
     inputRef.current.focus();
   };
 
