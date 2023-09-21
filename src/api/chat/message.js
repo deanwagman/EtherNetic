@@ -64,6 +64,14 @@ export default async (request, response) => {
       return;
     }
 
+    // Log OpenAI response headers
+    const headers = {};
+    for (const [key, value] of openAiResponse.headers.entries()) {
+      headers[key] = value;
+    }
+
+    console.log({ headers});
+
     const encoder = new TextEncoder();
 
     response.setHeader('Content-Type', 'application/octet-stream');

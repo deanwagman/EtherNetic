@@ -3,9 +3,11 @@ import Sequelize from 'sequelize';
 
 import UserModel from './models/User';
 import PromptModel from './models/Prompt';
+import TrainingMessageModel from './models/TrainingMessage';
 
-config();
+config(); // Load environment variables
 
+// Connect to database
 const db = {};
 const sequelize = new Sequelize(
   process.env.DB_DATABASE,
@@ -17,9 +19,12 @@ const sequelize = new Sequelize(
   },
   );
   
+// Create models
 db.User = UserModel(sequelize, Sequelize.DataTypes);
 db.Prompt = PromptModel(sequelize, Sequelize.DataTypes);
+db.TrainingMessage = TrainingMessageModel(sequelize, Sequelize.DataTypes);
 
+// Create associations
 Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {
     db[modelName].associate(db);

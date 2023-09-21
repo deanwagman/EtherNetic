@@ -11,16 +11,9 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.JSON,
         allowNull: false,
       },
-      createdAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW,
-      },
-      updatedAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW,
-      },
+      tags: {
+        type: DataTypes.JSON,
+      }
     },
     {
       freezeTableName: true,

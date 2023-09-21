@@ -39,6 +39,12 @@ import getPromptOptions from './api/prompts/getOptions';
 
 import autoComplete from './api/chat/autoComplete';
 
+import createTrainingMessages from './api/training-messages/create';
+import getTrainingMessages from './api/training-messages/getAll';
+import fileUpload from './api/training-messages/file-upload';
+import getAllFiles from './api/training-messages/getAllFiles';
+import deleteFile from './api/training-messages/deleteFile';
+
 import db from './db';
 
 db.sequelize.sync();
@@ -80,6 +86,12 @@ app.route('/api/prompts').get(getPrompts);
 app.route('/api/prompts/:id').delete(deletePrompt);
 app.route('/api/prompts/:id').put(updatePrompt);
 app.route('/api/prompts/:id').get(getPrompt);
+
+app.route('/api/training-messages').post(createTrainingMessages);
+app.route('/api/training-messages').get(getTrainingMessages);
+app.route('/api/training-messages/file-upload').post(fileUpload);
+app.route('/api/training-messages/get-all-files').get(getAllFiles);
+app.route('/api/training-messages/files/:id').delete(deleteFile);
 
 // Serve the SPA on every route
 app.get('*', async (req, res) => {

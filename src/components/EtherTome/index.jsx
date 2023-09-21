@@ -129,13 +129,32 @@ export default () => {
   };
 
   if (simulatedConversations.length) {
-    const onApprove = (id) =>
+    const onApprove = (id) => {
       viewTransition(() => {
         const newSimulatedConversations = simulatedConversations.filter(
           (conversation) => conversation.id !== id,
         );
         setSimulatedConversations(newSimulatedConversations);
       });
+
+      try {
+        const response = fetch('/api/training-messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            messages: simulatedConversations.find(
+              (conversation) => conversation.id === id,
+            ).messages,
+          }),
+        });
+
+        console.log(response);
+      } catch (e) {
+        console.error(e);
+      }
+    }
     const onDisapprove = (id) =>
       viewTransition(() => {
         const newSimulatedConversations = simulatedConversations.filter(

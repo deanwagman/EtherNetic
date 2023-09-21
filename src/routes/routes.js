@@ -4,11 +4,14 @@ import Login from '../components/Login';
 import Register from '../components/Register';
 import Etherboard from '../components/Etherboard';
 import EtherTome from '../components/EtherTome';
+import TrainingMessages from '../components/EtherTome/TrainingMessages';
 import CreatePrompt from '../components/EtherTome/prompts/CreatePrompt';
 import ViewPrompts from '../components/EtherTome/prompts/ViewPrompts';
 import EditPrompt from '../components/EtherTome/prompts/EditPrompt';
 import RainingImage from '../components/RainingImage';
 import Terminal from '../components/Terminal';
+import FileUpload from '../components/EtherTome/FileUpload';
+import ViewFiles from '../components/EtherTome/GetAllFiles';
 
 export default [
   {
@@ -44,12 +47,24 @@ export default [
         element: <EtherTome />,
       },
       {
+        path: 'training-messages',
+        element: <TrainingMessages />,
+      },
+      {
         path: 'raining-image',
         element: <RainingImage />,
       },
       {
         path: 'terminal',
         element: <Terminal />,
+      },
+      {
+        path: 'file-upload',
+        element: <FileUpload />,
+      },
+      {
+        path: 'view-files',
+        element: <ViewFiles />,
       }
     ],
   },
