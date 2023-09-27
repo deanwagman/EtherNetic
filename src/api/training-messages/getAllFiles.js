@@ -7,7 +7,7 @@ export default async (req, res) => {
     });
     const { data } = await response.json();
 
-    res.status(200).json({ files: data });
+    res.status(200).json(data);
   } catch (error) {
     console.error('Error getting files:', error);
 

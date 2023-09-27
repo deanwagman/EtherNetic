@@ -28,9 +28,10 @@ const Notification = styled('li', ({ id }) => ({
   width: '100%',
   maxWidth: '600px',
   position: 'relative',
+  lineHeight: '1.5em',
   ...colorShift,
   viewTransitionName: `notification-${id}`,
-  backdropFilter: `blur(10px)`
+  backdropFilter: `blur(10px)`,
 }));
 
 const Close = styled('button', {

@@ -1,5 +1,9 @@
 import db from '../../db';
+import { encode } from 'gpt-3-encoder';
 import { createParser } from 'eventsource-parser';
+import { Worker } from 'worker_threads';
+
+const tokenCounter = new Worker('./src/workers/tokenCounter.js');
 
 const createMessage = ({ role, content = '' }) => ({
   role,
@@ -13,9 +17,7 @@ const adaptSystemMessage = (message) =>
   });
 
 export default async (request, response) => {
-  const { messages, promptIds } = request.body;
-
-  console.log({ messages, promptIds });
+  const { messages, promptIds, model } = request.body;
 
   if (!messages) {
     response.status(400).send({ message: 'Messages are missing.' });
@@ -39,6 +41,22 @@ export default async (request, response) => {
       prompts.map(({ prompt }) => prompt).join('\n'),
     );
 
+    const messagesWithSystemMessage = [systemMessage, ...messages];
+
+    // Send a text chunk to the worker for token counting
+    tokenCounter.postMessage(messagesWithSystemMessage);
+
+    // Set up an event listener to receive messages from the worker
+    let tokenCount = 0;
+    tokenCounter.on('message', (count) => {
+      tokenCount = count;
+    });
+
+    // Handle errors from the worker
+    tokenCounter.on('error', (error) => {
+      res.status(500).send(error.message);
+    });
+
     const openAiResponse = await fetch(
       'https://api.openai.com/v1/chat/completions',
       {
@@ -48,8 +66,8 @@ export default async (request, response) => {
         },
         method: 'POST',
         body: JSON.stringify({
-          model: 'gpt-4',
-          messages: [systemMessage, ...messages],
+          model,
+          messages: messagesWithSystemMessage,
           stream: true,
           n: 1,
         }),
@@ -70,12 +88,11 @@ export default async (request, response) => {
       headers[key] = value;
     }
 
-    console.log({ headers});
-
     const encoder = new TextEncoder();
 
     response.setHeader('Content-Type', 'application/octet-stream');
     response.setHeader('Transfer-Encoding', 'chunked');
+    response.setHeader('token-count', tokenCount);
 
     const onParse = (event) => {
       const { data } = event;

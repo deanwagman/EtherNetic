@@ -1,15 +1,15 @@
 import React, { useReducer } from 'react';
 import { styled } from 'styletron-react';
-import colors from '../../../constants/colors';
-import TextInput from '../../Form/TextInput';
-import TextAreaWithGPT from '../../Form/TextAreaWithGPT';
-import TextArea from '../../Form/TextArea';
-import OptionButton from '../../Form/OptionButton';
-import FormButton from '../../Form/Button';
-import SubTitle from '../../Form/SubTitle';
-import FormTitle from '../../Form/Title';
-import Surface from '../../Surface';
-import useNotifications from '../../../hooks/useNotifications';
+import colors from '../../constants/colors';
+import TextInput from '../Form/TextInput';
+import TextAreaWithGPT from '../Form/TextAreaWithGPT';
+import TextArea from '../Form/TextArea';
+import OptionButton from '../Form/OptionButton';
+import FormButton from '../Form/Button';
+import SubTitle from '../Form/SubTitle';
+import FormTitle from '../Form/Title';
+import Surface from '../Surface';
+import useNotifications from '../../hooks/useNotifications';
 
 const Container = styled('div', {
   display: 'flex',
@@ -65,7 +65,7 @@ export default () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await fetch('/api/prompts/create', {
+    const response = await fetch('/api/prompts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title, prompt, category }),

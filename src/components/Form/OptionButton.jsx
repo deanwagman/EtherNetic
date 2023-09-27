@@ -16,27 +16,29 @@ const visuallyHidden = {
 };
 
 const Container = styled('label', ({ active }) => ({
-    display: 'inline-block',
-    color: colors.etherealMistWhite,
-    backdropFilter: 'hue-rotate(270deg) blur(10px)',
-    boxShadow: 'rgba(255,255,255,0.3) 0px 0px 80px',
-    transition: 'all 0.5s ease-in-out 0.1s',
-    textTransform: 'Capitalize',
+  display: 'inline-block',
+  color: colors.etherealMistWhite,
+  backdropFilter: 'hue-rotate(270deg) blur(10px)',
+  boxShadow: 'rgba(255,255,255,0.3) 0px 0px 80px',
+  transition: 'transform 0.5s ease-in-out 0.1s',
+  textTransform: 'Capitalize',
 
   fontFamily: '"Open Sans", sans-serif',
   padding: '1em',
   opacity: 0.8,
+  borderRadius: '0.25em',
+  transform: 'scale(1)',
 
   ':hover': {
     backgroundColor: colors.ceruleanBlue,
     cursor: 'pointer',
     transform: 'scale(1.1)',
-    transition: 'all 0.2s ease-in-out',
+    transition: 'transform 0.2s ease-in-out',
   },
 
   ...(active && {
     backgroundColor: colors.ceruleanBlue,
-    opacity: 1
+    opacity: 1,
   }),
 }));
 

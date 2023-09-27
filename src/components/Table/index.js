@@ -1,22 +1,15 @@
-import React from 'react';
 import { styled } from 'styletron-react';
 import colors from '../../constants/colors';
-import useGetTrainingMessages from '../../hooks/useGetTrainingMessages';
-import Loading from '../Loading';
 
-const Container = styled('div', {
-  height: '100%',
-  overflowY: 'auto',
-  padding: '5em',
-});
 
-const Table = styled('table', {
-  width: '100%',
+export const Table = styled('table', {
+//   width: '100%',
   borderCollapse: 'collapse',
   borderSpacing: 0,
+  viewTransitionName: 'table',
 });
 
-const ColumnHeader = styled('th', {
+export const ColumnHeader = styled('th', {
   padding: '0.5rem 1rem',
   color: 'white',
   fontFamily: '"Source Code Pro", monospace',
@@ -25,7 +18,7 @@ const ColumnHeader = styled('th', {
   textAlign: 'start',
 });
 
-const Row = styled('tr', ({ id }) => ({
+export const Row = styled('tr', ({ id }) => ({
   backgroundColor: 'rgba(255,255,255,0.1)',
   transition: 'all 1s ease-in-out',
   viewTransitionName: `row-${id}`,
@@ -41,14 +34,15 @@ const Row = styled('tr', ({ id }) => ({
   },
 }));
 
-const Cell = styled('td', {
+export const Cell = styled('td', {
   padding: '1rem',
   color: 'white',
   fontFamily: '"Source Code Pro", monospace',
   lineHeight: '1.5em',
+  wordBreak: 'break-word',
 });
 
-const ButtonContainer = styled('div', {
+export const ButtonContainer = styled('div', {
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'stretch',
@@ -56,7 +50,7 @@ const ButtonContainer = styled('div', {
   gap: '1em',
 });
 
-const Button = styled('button', {
+export const Button = styled('button', {
   display: 'inline-block',
   color: colors.etherealMistWhite,
   boxShadow: 'rgba(255,255,255,0.3) 0px 0px 80px',
@@ -75,36 +69,3 @@ const Button = styled('button', {
     transition: 'all 0.2s ease-in-out',
   },
 });
-
-export default () => {
-  const trainingMessages = useGetTrainingMessages();
-
-  if (!trainingMessages) {
-    return (
-      <Container>
-        <Loading />
-      </Container>
-    );
-  }
-
-  return (
-    <Container>
-      <Table>
-        <thead>
-          <tr>
-            <ColumnHeader>User</ColumnHeader>
-            <ColumnHeader>Spirit</ColumnHeader>
-          </tr>
-        </thead>
-        <tbody>
-          {trainingMessages.map(({ id, messages }) => (
-            <Row key={id} id={id}>
-              <Cell>{messages[1].content}</Cell>
-              <Cell>{messages[2].content}</Cell>
-            </Row>
-          ))}
-        </tbody>
-      </Table>
-    </Container>
-  );
-};

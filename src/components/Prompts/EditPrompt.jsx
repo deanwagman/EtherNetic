@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import { styled } from 'styletron-react';
 import { useParams } from 'react-router-dom';
-import colors from '../../../constants/colors';
-import TextInput from '../../Form/TextInput';
-import TextAreaWithGPT from '../../Form/TextAreaWithGPT';
-import TextArea from '../../Form/TextArea';
-import FormTitle from '../../Form/Title';
-import OptionButton from '../../Form/OptionButton';
-import FormButton from '../../Form/Button';
-import Surface from '../../Surface';
-import useNotifications from '../../../hooks/useNotifications';
+import colors from '../../constants/colors';
+import TextInput from '../Form/TextInput';
+import TextAreaWithGPT from '../Form/TextAreaWithGPT';
+import TextArea from '../Form/TextArea';
+import FormTitle from '../Form/Title';
+import OptionButton from '../Form/OptionButton';
+import FormButton from '../Form/Button';
+import Surface from '../Surface';
+import useNotifications from '../../hooks/useNotifications';
 
 const initialState = {
   title: '',
@@ -115,7 +115,7 @@ export default () => {
   return (
     <Container>
       <Form onSubmit={handleSubmit}>
-        <FormTitle>Update Prompt</FormTitle>
+        <FormTitle>Edit Prompt</FormTitle>
         <Surface style={{ width: '100%', maxWidth: '100ch' }}>
           <TextInput
             name="title"

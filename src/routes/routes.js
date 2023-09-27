@@ -4,14 +4,18 @@ import Login from '../components/Login';
 import Register from '../components/Register';
 import Etherboard from '../components/Etherboard';
 import EtherTome from '../components/EtherTome';
-import TrainingMessages from '../components/EtherTome/TrainingMessages';
-import CreatePrompt from '../components/EtherTome/prompts/CreatePrompt';
-import ViewPrompts from '../components/EtherTome/prompts/ViewPrompts';
-import EditPrompt from '../components/EtherTome/prompts/EditPrompt';
+import CreatePrompt from '../components/prompts/CreatePrompt';
+import EditPrompt from '../components/prompts/EditPrompt';
 import RainingImage from '../components/RainingImage';
 import Terminal from '../components/Terminal';
 import FileUpload from '../components/EtherTome/FileUpload';
-import ViewFiles from '../components/EtherTome/GetAllFiles';
+// import TrainingJobs from '../components/EtherTome/TrainingJobs';
+import ViewTable from '../components/Table/View';
+import ViewPrompts from '../components/Prompts/ViewPrompts';
+import ViewFiles from '../components/Files/ViewFiles';
+import CreateFile from '../components/Files/CreateFile';
+import ViewTrainingJobs from '../components/TrainingJobs/ViewTrainingJobs';
+import CreateTrainingJob from '../components/TrainingJobs/CreateTrainingJob';
 
 export default [
   {
@@ -31,24 +35,25 @@ export default [
         element: <Etherboard />,
       },
       {
-        path: 'create-prompt',
-        element: <CreatePrompt />,
-      },
-      {
-        path: 'view-prompts',
+        path: 'prompts',
         element: <ViewPrompts />,
       },
       {
-        path: 'edit-prompt/:id',
+        path: 'prompts/new',
+        element: <CreatePrompt />,
+      },
+      {
+        path: 'prompts/:id',
         element: <EditPrompt />,
       },
-      {
-        path: 'simulated-conversations',
-        element: <EtherTome />,
-      },
+
       {
         path: 'training-messages',
-        element: <TrainingMessages />,
+        element: <ViewTable resource="training-messages" />,
+      },
+      {
+        path: 'training-messages/new',
+        element: <EtherTome />,
       },
       {
         path: 'raining-image',
@@ -63,9 +68,21 @@ export default [
         element: <FileUpload />,
       },
       {
-        path: 'view-files',
+        path: 'files',
         element: <ViewFiles />,
-      }
+      },
+      {
+        path: 'files/new',
+        element: <CreateFile />,
+      },
+      {
+        path: 'training-jobs',
+        element: <ViewTrainingJobs />,
+      },
+      {
+        path: 'training-jobs/new',
+        element: <CreateTrainingJob />,
+      },
     ],
   },
 ];

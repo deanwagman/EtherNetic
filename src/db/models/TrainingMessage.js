@@ -13,7 +13,11 @@ export default (sequelize, DataTypes) => {
       },
       tags: {
         type: DataTypes.JSON,
-      }
+      },
+      active: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
     },
     {
       freezeTableName: true,

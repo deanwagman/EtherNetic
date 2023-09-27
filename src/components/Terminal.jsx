@@ -6,6 +6,28 @@ import useGetPromptOptions from '../hooks/useGetPromptOptions';
 import useChatGPT from '../hooks/useChatGPT';
 import Messenger from '../components/Messages';
 import Surface from './Surface';
+import ModelSelector from './Form/ModelSelector';
+
+const fetchSummary = async (messages) => {
+  try {
+    const response = await fetch('/api/summaries', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messages,
+      }),
+    });
+
+    const data = await response.json();
+
+    console.log({ data });
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 const Container = styled('div', {
   display: 'flex',
@@ -36,11 +58,22 @@ const ChatContainer = styled('div', {
   maxWidth: '100ch',
 });
 
+const surfaceStyles = {
+  maxHeight: '88vh',
+  alignSelf: 'center',
+  overflowY: 'auto',
+  overflowX: 'visible',
+};
+
 export default () => {
   const [selectedPromptIds, setSelectedPromptIds] = useState([]);
+  const [selectedModel, setSelectedModel] = useState('gpt-3.5-turbo');
   const promptOptions = useGetPromptOptions();
   const promptIds = promptOptions.map((o) => o.id);
-  const { send, messages, clear } = useChatGPT(selectedPromptIds);
+  const { send, messages, clear } = useChatGPT({
+    promptIds: selectedPromptIds,
+    model: selectedModel,
+  });
   const isPromptOptionsLocked = messages.length > 0;
   const onSubmit = (value) => {
     send(value);
@@ -51,10 +84,19 @@ export default () => {
           selectedPromptIds.filter((thatId) => thatId !== id),
         )
       : setSelectedPromptIds([...selectedPromptIds, id]);
+  const handleModelChange = (e) => {
+    setSelectedModel(e?.target?.value);
+  };
 
   return (
     <Container>
-      <Surface $style={{ height: 'fit-content', alignSelf: 'center' }}>
+      <Surface $style={surfaceStyles}>
+        <OptionButton
+          onChange={() => fetchSummary(messages)}
+          label="Summarize"
+          value={false}
+        />
+        <ModelSelector selected={selectedModel} onChange={handleModelChange} />
         <ButtonContainer>
           {isPromptOptionsLocked && (
             <OptionButton

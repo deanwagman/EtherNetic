@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { styled } from 'styletron-react';
-import { useNavigate } from 'react-router-dom';
-import Surface from '../../Surface';
-import Loading from '../../Loading';
-import colors from '../../../constants/colors';
-import useNotifications from '../../../hooks/useNotifications';
-import useGetPrompts from '../../../hooks/useGetPrompts';
-import viewTransition from '../../../util/viewTransitions';
-import Modal from '../../Modal';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
+import Surface from '../Surface';
+import Loading from '../Loading';
+import colors from '../../constants/colors';
+import useNotifications from '../../hooks/useNotifications';
+import useFetchResource from '../../hooks/useFetchResource';
+import viewTransition from '../../util/viewTransitions';
+import Modal from '../Modal';
 
 const Container = styled('div', {
   height: '100%',
@@ -19,6 +19,7 @@ const Table = styled('table', {
   width: '100%',
   borderCollapse: 'collapse',
   borderSpacing: 0,
+  viewTransitionName: 'table',
 });
 
 const ColumnHeader = styled('th', {
@@ -81,26 +82,25 @@ const Button = styled('button', {
   },
 });
 
-const ViewPrompts = ({ children }) => {
-  const prompts = useGetPrompts();
+const ViewTable = ({ children, resource = '' }) => {
+  const data = useFetchResource(resource);
   const [confirmDeleteId, setConfirmDelete] = useState(null);
-  const onCloseTestModal = () => viewTransition(() => setShowTestModal(false));
-  const onOpenTestModal = () => viewTransition(() => setShowTestModal(true));
   const { add: addNotification } = useNotifications();
   const navigate = useNavigate();
-  const editPrompt = (id) => {
-    navigate(`/edit-prompt/${id}`);
+  const columnNames = Object.keys(data[0] || {});
+  const handleEdit = (id) => {
+    navigate(`${id}`);
   };
 
-  const deletePrompt = async (id) => {
+  const handleDelete = async (id) => {
     try {
-      const response = await fetch(`/api/prompts/${id}`, {
+      const response = await fetch(`/api/${resource}/${id}`, {
         method: 'DELETE',
       });
       const data = await response.json();
 
       viewTransition(() => {
-        setPrompts((prompts) => prompts.filter((prompt) => prompt.id !== id));
+        setItems((items) => items.filter((item) => item.id !== id));
       });
 
       addNotification({
@@ -113,7 +113,7 @@ const ViewPrompts = ({ children }) => {
     }
   };
 
-  const ConfirmDeletePromptModal = ({ id }) => (
+  const ConfirmDeleteModal = ({ id }) => (
     <Modal
       onClose={() => setConfirmDelete(null)}
       options={[
@@ -121,56 +121,63 @@ const ViewPrompts = ({ children }) => {
         {
           label: 'ok',
           onClick: () => {
-            deletePrompt(id);
+            handleDelete(id);
             setConfirmDelete(null);
           },
         },
       ]}
     >
-      <p>Are you sure you want to delete this prompt?</p>
+      <p>Are you sure you want to delete this?</p>
     </Modal>
   );
 
   return (
     <Container>
-      {prompts.length === 0 ? (
+      {/* <Outlet /> */}
+
+      {data.length === 0 ? (
         <Loading />
       ) : (
-        <Table>
-          <thead>
-            <Row id="table-header">
-              <ColumnHeader>Title</ColumnHeader>
-              <ColumnHeader>Prompt</ColumnHeader>
-              <ColumnHeader>Category</ColumnHeader>
-              <ColumnHeader>Actions</ColumnHeader>
-            </Row>
-          </thead>
-
-          <tbody>
-            {prompts.map((prompt) => (
-              <Row key={prompt.id} id={prompt.id}>
-                <Cell>{prompt.title}</Cell>
-                <Cell>{prompt.prompt}</Cell>
-                <Cell>{prompt.category}</Cell>
-                <Cell>
-                  <ButtonContainer>
-                    <Button onClick={() => editPrompt(prompt.id)}>Edit</Button>
-                    <Button onClick={() => setConfirmDelete(prompt.id)}>
-                      Delete
-                    </Button>
-                  </ButtonContainer>
-                </Cell>
+        <>
+          <Button onClick={() => navigate(`new`)}>
+            Create {resource}
+          </Button>
+          <Table>
+            <thead>
+              <Row id="table-header">
+                {columnNames.map((columnName) => (
+                  <ColumnHeader key={columnName}>{columnName}</ColumnHeader>
+                ))}
+                <ColumnHeader key="actions">Actions</ColumnHeader>
               </Row>
-            ))}
-          </tbody>
-        </Table>
+            </thead>
+
+            <tbody>
+              {data.map((row) => (
+                <Row key={row.id} id={row.id}>
+                  {Object.values(row).map((value, index) => (
+                    <Cell key={`${value}-${index}`}>
+                      {JSON.stringify(value)}
+                    </Cell>
+                  ))}
+                  <Cell>
+                    <ButtonContainer>
+                      <Button onClick={() => handleEdit(row.id)}>Edit</Button>
+                      <Button onClick={() => setConfirmDelete(row.id)}>
+                        Delete
+                      </Button>
+                    </ButtonContainer>
+                  </Cell>
+                </Row>
+              ))}
+            </tbody>
+          </Table>
+        </>
       )}
 
-      {confirmDeleteId ? (
-        <ConfirmDeletePromptModal id={confirmDeleteId} />
-      ) : null}
+      {confirmDeleteId ? <ConfirmDeleteModal id={confirmDeleteId} /> : null}
     </Container>
   );
 };
 
-export default ViewPrompts;
+export default ViewTable;

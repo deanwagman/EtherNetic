@@ -45,9 +45,16 @@ import fileUpload from './api/training-messages/file-upload';
 import getAllFiles from './api/training-messages/getAllFiles';
 import deleteFile from './api/training-messages/deleteFile';
 
+import getTrainingJobs from './api/training-jobs/get';
+import createTrainingJob from './api/training-jobs/create';
+
+import getModels from './api/fine-tune/getModels';
+
+import createSummary from './api/summaries/create';
+
 import db from './db';
 
-db.sequelize.sync();
+db.sequelize.sync({ alter: true });
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -80,7 +87,7 @@ app.route('/api/message').post(chatMessage);
 app.route('/api/fine-tune/simulate').post(simulateFineTune);
 app.route('/api/auto-complete').post(autoComplete);
 
-app.route('/api/prompts/create').post(createPrompt);
+app.route('/api/prompts').post(createPrompt);
 app.route('/api/prompts/options').get(getPromptOptions);
 app.route('/api/prompts').get(getPrompts);
 app.route('/api/prompts/:id').delete(deletePrompt);
@@ -89,9 +96,16 @@ app.route('/api/prompts/:id').get(getPrompt);
 
 app.route('/api/training-messages').post(createTrainingMessages);
 app.route('/api/training-messages').get(getTrainingMessages);
-app.route('/api/training-messages/file-upload').post(fileUpload);
-app.route('/api/training-messages/get-all-files').get(getAllFiles);
+app.route('/api/training-messages/files').post(fileUpload);
+app.route('/api/training-messages/files').get(getAllFiles);
 app.route('/api/training-messages/files/:id').delete(deleteFile);
+
+app.route('/api/training-jobs').get(getTrainingJobs);
+app.route('/api/training-jobs').post(createTrainingJob);
+
+app.route('/api/fine-tune/models').get(getModels);
+
+app.route('/api/summaries').post(createSummary);
 
 // Serve the SPA on every route
 app.get('*', async (req, res) => {

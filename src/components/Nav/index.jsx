@@ -77,10 +77,8 @@ export default () => {
       <AncillaryNav>
         <TransitionLink to="/login">Login</TransitionLink>
         <TransitionLink to="/register">Register</TransitionLink>
-        <TransitionLink to="/create-prompt">Create prompt</TransitionLink>
-        <TransitionLink to="/view-prompts">View Prompts</TransitionLink>
+        <TransitionLink to="/prompts">Prompts</TransitionLink>
         <TransitionLink to="/training-messages">Training Messages</TransitionLink>
-        <TransitionLink to="/simulated-conversations">Simulate Messages</TransitionLink>
         <TransitionLink to="/etherboard">EtherBoard</TransitionLink>
         <TransitionLink to="/terminal">Terminal</TransitionLink>
         {/* <TransitionLink to="/raining-image">💧</TransitionLink> */}

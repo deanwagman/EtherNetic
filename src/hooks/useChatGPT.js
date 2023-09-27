@@ -29,19 +29,16 @@ const shouldSendMessages = (messages) => {
   return lastMessageSenderRole === 'user';
 };
 
-const useChatGPT = (promptIds = []) => {
+const useChatGPT = ({ promptIds = [], model = 'gpt-3.5-turbo' }) => {
   const [messages, setMessages] = useState([]);
   const [isRequesting, setIsRequesting] = useState(false);
 
   const addSystemMessage = (message) =>
     setMessages([...messages, adaptSystemMessage(message)]);
-  const addUserMessage = (message) => {
-    console.log('adding user message', message);
-    return setMessages([...messages, adaptUserMessage(message)]);
-  };
-  const addAssistantMessage = (message) => {
+  const addUserMessage = (message) =>
+    setMessages([...messages, adaptUserMessage(message)]);
+  const addAssistantMessage = (message) =>
     setMessages([...messages, adaptAssistantMessage(message)]);
-  };
   const clearMessages = () => setMessages([]);
 
   const adaptMessagesForApi = (messages) =>
@@ -77,6 +74,7 @@ const useChatGPT = (promptIds = []) => {
         body: JSON.stringify({
           messages: adaptedMessages,
           promptIds: promptIds || [],
+          model,
         }),
       });
       const reader = response.body.getReader();
@@ -96,9 +94,6 @@ const useChatGPT = (promptIds = []) => {
         }
 
         const text = decoder.decode(value);
-
-        console.log({ text, assistantMessage, messages });
-
         updateMessage(assistantMessage.id, (prevText) => prevText + text);
       }
     } catch (error) {
