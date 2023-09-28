@@ -1,21 +1,21 @@
 import { useEffect, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+
+const fetchFiles = async () => {
+  try {
+    const response = await fetch('/api/training-messages/files');
+    const files = await response.json();
+
+    return files;
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 export default () => {
-  const [files, setFiles] = useState([]);
-  const fetchFiles = async () => {
-    try {
-      const response = await fetch('/api/training-messages/files');
-      const files = await response.json();
+  const queryClient = useQueryClient();
+  const { data: files, isLoading, error } = useQuery(['files'], fetchFiles);
+  const invalidateFiles = () => queryClient.invalidateQueries('files');
 
-      setFiles(files);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  useEffect(() => {
-    fetchFiles();
-  }, []);
-
-  return [files, fetchFiles];
+  return [files || [], invalidateFiles];
 };
