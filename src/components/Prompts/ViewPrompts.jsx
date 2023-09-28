@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { styled } from 'styletron-react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import Surface from '../Surface';
 import Loading from '../Loading';
 import colors from '../../constants/colors';
 import useNotifications from '../../hooks/useNotifications';
-import useFetchResource from '../../hooks/useFetchResource';
 import viewTransition from '../../util/viewTransitions';
 import Modal from '../Modal';
 import {
@@ -26,36 +26,45 @@ const Container = styled('div', {
   padding: '5em',
 });
 
+const fetchPrompts = async () => {
+  try {
+    const response = await fetch('/api/prompts');
+
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
+
 export default () => {
-  const data = useFetchResource('prompts');
+  const queryClient = useQueryClient();
+  const { data } = useQuery({
+    queryKey: ['prompts'],
+    queryFn: fetchPrompts,
+    initialData: [],
+  });
+  const { mutate: deletePrompt } = useMutation({
+    mutationKey: 'deletePrompt',
+    mutationFn: (id) => fetch(`/api/prompts/${id}`, { method: 'DELETE' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['prompts']});
+      addNotification({
+        message: 'Prompt deleted successfully',
+      });
+    },
+    onError: () => {
+      addNotification({
+        message: 'Error deleting prompt',
+      });
+    },
+  });
   const [confirmDeleteId, setConfirmDelete] = useState(null);
   const { add: addNotification } = useNotifications();
   const navigate = useNavigate();
   const columnNames = Object.keys(data[0] || {});
   const handleEdit = (id) => {
     navigate(`${id}`);
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      const response = await fetch(`/api/prompts/${id}`, {
-        method: 'DELETE',
-      });
-      const data = await response.json();
-
-      // This is broken as we're pulling resources from abstraction
-      //   viewTransition(() => {
-      //     setItems((items) => items.filter((item) => item.id !== id));
-      //   });
-
-      addNotification({
-        message: 'Prompt deleted successfully',
-      });
-    } catch (error) {
-      addNotification({
-        message: 'Error deleting prompt',
-      });
-    }
   };
 
   const ConfirmDeleteModal = ({ id }) => (
@@ -66,7 +75,7 @@ export default () => {
         {
           label: 'ok',
           onClick: () => {
-            handleDelete(id);
+            deletePrompt(id);
             setConfirmDelete(null);
           },
         },

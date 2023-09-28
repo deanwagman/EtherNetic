@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default ({ html, styles }) => (
+export default ({ html, styles, state }) => (
   <html lang="en">
     <head>
       <meta charSet="UTF-8" />
@@ -43,6 +43,9 @@ export default ({ html, styles }) => (
       <div id="root" dangerouslySetInnerHTML={{ __html: html }} />
       <div id="modal-root" />
       <script type="text/javascript" src="/dist/bundle.js" defer></script>
+      <script>{`window.__REACT_QUERY_STATE__ = ${JSON.stringify(
+        state,
+      )}`}</script>
     </body>
   </html>
 );

@@ -28,13 +28,13 @@ const Input = styled('input', {
   },
 });
 
-export default ({ type = 'text', value, name, ...otherProps }) => {
+export default ({ type = 'text', name, ...otherProps }) => {
   const uuid = useId();
 
   return (
     <>
       <Label htmlFor={uuid}>{name}</Label>
-      <Input id={uuid} type={type} value={value} name={name} {...otherProps} />
+      <Input id={uuid} name={name} type={type} {...otherProps} />
     </>
   );
 };

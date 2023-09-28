@@ -28,13 +28,13 @@ const TextArea = styled('textarea', {
   },
 });
 
-export default forwardRef(({ value, name, ...otherProps }, ref) => {
+export default forwardRef(({ name, ...otherProps }, ref) => {
   const uuid = useId();
 
   return (
     <>
       <Label htmlFor={uuid}>{name}</Label>
-      <TextArea id={uuid} value={value} name={name} ref={ref} {...otherProps} />
+      <TextArea id={uuid} name={name} ref={ref} {...otherProps} />
     </>
   );
 });

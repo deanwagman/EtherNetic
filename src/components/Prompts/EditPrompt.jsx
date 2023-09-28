@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useReducer } from 'react';
+import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
 import { styled } from 'styletron-react';
 import { useParams } from 'react-router-dom';
 import colors from '../../constants/colors';
@@ -17,22 +18,7 @@ const initialState = {
   category: '',
 };
 
-const reducer = (state, action) => {
-  switch (action.type) {
-    case 'title':
-      return { ...state, title: action.payload };
-    case 'category':
-      return { ...state, category: action.payload };
-    case 'prompt':
-      return { ...state, prompt: action.payload };
-    case 'reset':
-      return { ...initialState };
-    case 'set':
-      return { ...state, ...action.payload };
-    default:
-      return state;
-  }
-};
+const reducer = (state, payload) => ({ ...state, ...payload });
 
 const Container = styled('div', {
   display: 'flex',
@@ -54,63 +40,68 @@ const Form = styled('form', {
 });
 
 export default () => {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, set] = useReducer(reducer, initialState);
+  const { title, prompt, category } = state;
   const { id } = useParams();
   const { add: addNotification } = useNotifications();
-  const { title, prompt, category } = state;
-  const handleChange = (e) => {
-    dispatch({ type: e.target.name, payload: e.target.value });
-  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      // update prompt
-      const response = await fetch(`/api/prompts/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title,
-          prompt,
-          category,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        addNotification({
-          message: 'Prompt updated successfully',
-        });
+  const queryClient = useQueryClient();
+  const { data, isError } = useQuery({
+    queryKey: ['prompt', id],
+    queryFn: async () => {
+      try {
+        const response = await fetch(`/api/prompts/${id}`);
+        return await response.json();
+      } catch (error) {
+        throw new Error(error);
       }
+    },
+    onSuccess: ({ title, prompt, category }) => {
+      console.log('data', data);
+      set({ title, prompt, category });
+    },
+    onError: (error) => {
+      addNotification({
+        message: error,
+      });
+    },
+  });
 
-      // reset form
-      dispatch({ type: 'set', payload: data });
-
+  const { mutate: updatePrompt } = useMutation({
+    mutationKey: 'updatePrompt',
+    mutationFn: (data) => {
+      try {
+        fetch(`/api/prompts/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['prompts'] });
       addNotification({
         message: 'Prompt updated successfully',
       });
-    } catch (error) {
+    },
+    onError: () => {
       addNotification({
         message: 'Error updating prompt',
       });
-    }
+    },
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    updatePrompt({ title, prompt, category });
   };
 
-  useEffect(() => {
-    try {
-      (async () => {
-        const response = await fetch(`/api/prompts/${id}`);
-        const data = await response.json();
-        dispatch({ type: 'set', payload: data });
-      })();
-    } catch (error) {
-      addNotification({
-        message: 'Error loading prompt',
-      });
-    }
-  }, []);
+  const onChange = ({ target }) => set({ [target.name]: target.value });
+  const onPromptChange = (value) => set({ prompt: value });
+
+  console.log('state', state);
 
   return (
     <Container>
@@ -121,25 +112,23 @@ export default () => {
             name="title"
             label="Prompt Title"
             value={title}
-            onChange={handleChange}
+            onChange={onChange}
           />
           <TextInput
             name="category"
             label="Prompt Category"
             value={category}
-            onChange={handleChange}
+            onChange={onChange}
           />
           <TextAreaWithGPT
             name="prompt"
             label="Prompt Content"
             value={prompt}
-            onChange={(text) => {
-              dispatch({ type: 'prompt', payload: text });
-            }}
+            onChange={onPromptChange}
             $style={{ height: '30em' }}
           />
         </Surface>
-        <FormButton>Update Prompt</FormButton>
+        <FormButton disabled={isError}>Update Prompt</FormButton>
       </Form>
     </Container>
   );

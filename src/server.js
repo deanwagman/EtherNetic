@@ -15,6 +15,13 @@ import { Provider as StyleProvider } from 'styletron-react';
 import { Server as Styletron } from 'styletron-engine-atomic';
 import { StaticRouterProvider } from 'react-router-dom/server';
 
+import {
+  dehydrate,
+  Hydrate,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query';
+
 import webpackConfig from '../webpack.config';
 import Document from './components/Document';
 
@@ -110,20 +117,27 @@ app.route('/api/summaries').post(createSummary);
 // Serve the SPA on every route
 app.get('*', async (req, res) => {
   const { router, context } = await getStaticRouter(req);
+  const queryClient = new QueryClient();
+  // await queryClient.prefetchQuery(['key'], fn)
+  const dehydratedState = dehydrate(queryClient);
 
   // Render markup for Client
   const html = renderToString(
-    <StyleProvider value={engine} id="styletron">
-      <NotificationsProvider>
-        <StaticRouterProvider router={router} context={context} />
-      </NotificationsProvider>
-    </StyleProvider>,
+    <QueryClientProvider client={queryClient}>
+      <Hydrate state={dehydratedState}>
+        <StyleProvider value={engine} id="styletron">
+          <NotificationsProvider>
+            <StaticRouterProvider router={router} context={context} />
+          </NotificationsProvider>
+        </StyleProvider>
+      </Hydrate>
+    </QueryClientProvider>,
   );
 
   // Extract CSS from Styletron
   const styles = engine.getCss();
 
-  res.send(renderToString(<Document styles={styles} html={html} />));
+  res.send(renderToString(<Document styles={styles} html={html} state={dehydratedState} />));
 });
 
 app.listen(port, async () => {

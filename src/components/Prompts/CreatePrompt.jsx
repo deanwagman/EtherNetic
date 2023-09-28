@@ -1,4 +1,5 @@
 import React, { useReducer } from 'react';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { styled } from 'styletron-react';
 import colors from '../../constants/colors';
 import TextInput from '../Form/TextInput';
@@ -53,8 +54,10 @@ const reducer = (state, action) => {
 
 export default () => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { add: addNotification } = useNotifications();
   const { title, prompt, category } = state;
+
+  const { add: addNotification } = useNotifications();
+
   const handleChange = (e) => {
     dispatch({ type: e.target.name, payload: e.target.value });
   };
@@ -62,28 +65,30 @@ export default () => {
     dispatch({ type: 'reset' });
   };
 
-  const handleSubmit = async (e) => {
+  const { mutate: createPrompt } = useMutation({
+    mutationKey: 'createPrompt',
+    mutationFn: (data) =>
+      fetch('/api/prompts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }),
+    onSuccess: (data) => {
+      addNotification({
+        message: `Successfully created prompt: ${data.title}`,
+      });
+      dispatch({ type: 'reset' });
+    },
+    onError: () => {
+      addNotification({
+        message: 'Error creating prompt',
+      });
+    },
+  });
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-
-    const response = await fetch('/api/prompts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, prompt, category }),
-    });
-
-    const body = await response.json();
-
-    if (body.error) {
-      addNotification(body.error);
-      return;
-    }
-
-    if (body) {
-      const { title } = body;
-      const message = `Successfully created prompt: ${title}`;
-      addNotification({ message });
-      resetForm();
-    }
+    createPrompt(state);
   };
 
   return (
