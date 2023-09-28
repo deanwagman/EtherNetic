@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useId } from 'react';
+import React, { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import viewTransition from '../util/viewTransitions';
+import useNotification from './useNotifications';
 
 const createMessage = ({ role, content = '' }) => ({
   id: Date.now(),
@@ -18,37 +20,17 @@ const adaptAssistantMessage = (message) =>
     role: 'assistant',
     content: message,
   });
-const adaptSystemMessage = (message) =>
-  createMessage({
-    role: 'system',
-    content: message,
-  });
 
-const shouldSendMessages = (messages) => {
-  const { role: lastMessageSenderRole } = messages[messages.length - 1];
-  return lastMessageSenderRole === 'user';
-};
+const adaptMessagesForApi = (messages) =>
+  messages.map(({ content, role }) => ({ role, content }));
 
 const useChatGPT = ({ promptIds = [], model = 'gpt-3.5-turbo' }) => {
   const [messages, setMessages] = useState([]);
-  const [isRequesting, setIsRequesting] = useState(false);
-
-  const addSystemMessage = (message) =>
-    setMessages([...messages, adaptSystemMessage(message)]);
-  const addUserMessage = (message) =>
-    setMessages([...messages, adaptUserMessage(message)]);
-  const addAssistantMessage = (message) =>
-    setMessages([...messages, adaptAssistantMessage(message)]);
-  const clearMessages = () => setMessages([]);
-
-  const adaptMessagesForApi = (messages) =>
-    messages.map(({ content, role }) => ({ role, content }));
+  const { add: addNotification } = useNotification();
 
   const updateMessage = (id, updateFn = () => {}) => {
-    console.log('updating message', id);
     setMessages((prev) =>
       prev.map((message) => {
-        console.log({ message });
         if (message.id === id) {
           return { ...message, content: updateFn(message.content) };
         }
@@ -57,18 +39,13 @@ const useChatGPT = ({ promptIds = [], model = 'gpt-3.5-turbo' }) => {
     );
   };
 
-  const request = async (value) => {
-    const endpoint = '/api/message';
-    const userMessage = adaptUserMessage(value);
+  const queryClient = useQueryClient();
+  const { mutate: sendMessages } = useMutation({
+    mutationFn: async (value) => {
+      const userMessage = adaptUserMessage(value);
+      const adaptedMessages = adaptMessagesForApi([...messages, userMessage]);
 
-    setMessages((messages) => [...messages, userMessage]);
-    setIsRequesting(true);
-
-    const decoder = new TextDecoder();
-    const adaptedMessages = adaptMessagesForApi([...messages, userMessage]);
-
-    try {
-      const response = await fetch(endpoint, {
+      const response = await fetch('/api/message', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -77,15 +54,12 @@ const useChatGPT = ({ promptIds = [], model = 'gpt-3.5-turbo' }) => {
           model,
         }),
       });
+
       const reader = response.body.getReader();
-
+      const decoder = new TextDecoder();
       const assistantMessage = adaptAssistantMessage('');
-
-      setIsRequesting(false);
-
       setMessages((messages) => [...messages, assistantMessage]);
 
-      let buffer = '';
       while (true) {
         const { done, value } = await reader.read();
 
@@ -96,14 +70,21 @@ const useChatGPT = ({ promptIds = [], model = 'gpt-3.5-turbo' }) => {
         const text = decoder.decode(value);
         updateMessage(assistantMessage.id, (prevText) => prevText + text);
       }
-    } catch (error) {
-      setIsRequesting(false);
-      console.error(error);
-    }
-  };
+    },
+    onMutate: (value) => {
+      setMessages((messages) => [...messages, adaptUserMessage(value)]);
+    },
+    onError: (err) => {
+      addNotification({
+        type: 'error',
+        message: err,
+      });
+      setMessages((messages) => messages.slice(0, -1));
+    },
+  });
 
-  const send = (value) => viewTransition(() => request(value));
-  const clear = () => viewTransition(clearMessages);
+  const send = (value) => viewTransition(() => sendMessages(value));
+  const clear = () => viewTransition(() => setMessages([]));
 
   return {
     messages,
