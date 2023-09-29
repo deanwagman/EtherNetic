@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { styled } from 'styletron-react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import Surface from '../Surface';
 import Loading from '../Loading';
 import colors from '../../constants/colors';
@@ -18,20 +19,45 @@ import {
 } from '../Table';
 
 const Container = styled('div', {
-  height: '100%',
-  overflowY: 'auto',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
   padding: '5em',
+  overflowX: 'auto',
 });
 
+const fetchFiles = async () => {
+  const response = await fetch('/api/training-messages/files');
+  const data = await response.json();
+  return data;
+};
+
 export default () => {
-  const [files, setFiles] = useState([]);
+  const {
+    data: files,
+    isLoading,
+    error: fetchFilesError,
+  } = useQuery({
+    queryKey: ['files'],
+    queryFn: () => fetchFiles(),
+  });
+  const { mutate: deleteFile } = useMutation({
+    mutationKey: 'deleteFile',
+    mutationFn: (id) =>
+      fetch(`/api/training-messages/files/${id}`, { method: 'DELETE' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['files'] });
+      addNotification({
+        message: 'File deleted successfully',
+      });
+    },
+    onError: () => {
+      addNotification({
+        message: 'Error deleting file',
+      });
+    },
+  });
   const [confirmDeleteId, setConfirmDelete] = useState(null);
   const { add: addNotification } = useNotifications();
   const navigate = useNavigate();
-  const columnNames = Object.keys(files[0] || {});
+  const columnNames = Object.keys(isLoading || fetchFilesError ? {} : files[0]);
   const handleEdit = (id) => {
     navigate(`${id}`);
   };
@@ -74,53 +100,51 @@ export default () => {
     </Modal>
   );
 
-  useEffect(() => {
-    fetch('/api/training-messages/files')
-      .then((res) => res.json())
-      .then((data) => {
-        setFiles(data);
-      })
-      .catch((err) => addNotification({ message: err.message }));
-  }, []);
+  if (fetchFilesError) {
+    return (
+      <Container>
+        <p>There was an error fetching files</p>
+      </Container>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <Container>
+        <Loading />
+      </Container>
+    );
+  }
 
   return (
     <Container>
-      {files.length === 0 ? (
-        <Loading />
-      ) : (
-        <>
-          <Table>
-            <thead>
-              <Row id="table-header">
-                {columnNames.map((columnName) => (
-                  <ColumnHeader key={columnName}>{columnName}</ColumnHeader>
-                ))}
-                <ColumnHeader key="actions">Actions</ColumnHeader>
-              </Row>
-            </thead>
+      <Table>
+        <thead>
+          <Row id="table-header">
+            {columnNames.map((columnName) => (
+              <ColumnHeader key={columnName}>{columnName}</ColumnHeader>
+            ))}
+            <ColumnHeader key="actions">Actions</ColumnHeader>
+          </Row>
+        </thead>
 
-            <tbody>
-              {files.map((row) => (
-                <Row key={row.id} id={row.id}>
-                  {Object.values(row).map((value, index) => (
-                    <Cell key={`${value}-${index}`}>
-                      {JSON.stringify(value)}
-                    </Cell>
-                  ))}
-                  <Cell>
-                    <ButtonContainer>
-                      <Button onClick={() => setConfirmDelete(row.id)}>
-                        Delete
-                      </Button>
-                    </ButtonContainer>
-                  </Cell>
-                </Row>
+        <tbody>
+          {files.map((row) => (
+            <Row key={row.id} id={row.id}>
+              {Object.values(row).map((value, index) => (
+                <Cell key={`${value}-${index}`}>{JSON.stringify(value)}</Cell>
               ))}
-            </tbody>
-          </Table>
-        </>
-      )}
-
+              <Cell>
+                <ButtonContainer>
+                  <Button onClick={() => setConfirmDelete(row.id)}>
+                    Delete
+                  </Button>
+                </ButtonContainer>
+              </Cell>
+            </Row>
+          ))}
+        </tbody>
+      </Table>
       {confirmDeleteId ? <ConfirmDeleteModal id={confirmDeleteId} /> : null}
     </Container>
   );

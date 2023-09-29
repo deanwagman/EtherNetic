@@ -1,9 +1,8 @@
 import { styled } from 'styletron-react';
 import colors from '../../constants/colors';
 
-
 export const Table = styled('table', {
-//   width: '100%',
+  // maxWidth: '100%',
   borderCollapse: 'collapse',
   borderSpacing: 0,
   viewTransitionName: 'table',
