@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { styled } from 'styletron-react';
-import { useNavigate, useLocation, Outlet } from 'react-router-dom';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Surface from '../Surface';
 import Loading from '../Loading';
 import colors from '../../constants/colors';
@@ -18,68 +17,48 @@ import {
 } from '../Table';
 
 const Container = styled('div', {
+  height: '100%',
+  overflowY: 'auto',
+  display: 'flex',
+  flexDirection: 'column',
   padding: '5em',
-  overflowX: 'auto',
 });
 
-const fetchFiles = async () => {
-  const response = await fetch('/api/training-messages/files');
-  const data = await response.json();
-  return data;
-};
-
 export default () => {
+  const [confirmDeleteId, setConfirmDelete] = useState(null);
+  const { add: addNotification } = useNotifications();
+  const queryClient = useQueryClient();
   const {
-    data: files,
+    data: trainingMessages,
+    error: fetchTrainingMessagesError,
     isLoading,
-    error: fetchFilesError,
   } = useQuery({
-    queryKey: ['files'],
-    queryFn: () => fetchFiles(),
+    queryKey: ['training-messages'],
+    queryFn: async () => {
+        const response = await fetch('/api/training-messages');
+        const data = await response.json();
+        return data;
+    },
   });
-  const { mutate: deleteFile } = useMutation({
-    mutationKey: 'deleteFile',
-    mutationFn: (id) =>
-      fetch(`/api/training-messages/files/${id}`, { method: 'DELETE' }),
+  const { mutate: deleteTrainingMessage } = useMutation({
+    mutationKey: 'deleteTrainingMessage',
+    mutationFn: async (id) => {
+        const response = await fetch(`/api/training-messages/${id}`, { method: 'DELETE' });
+        return response;
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['files'] });
+      queryClient.invalidateQueries({ queryKey: ['training-messages'] });
       addNotification({
-        message: 'File deleted successfully',
+        message: 'Training message deleted successfully',
       });
     },
     onError: () => {
       addNotification({
-        message: 'Error deleting file',
+        message: 'Error deleting training message',
       });
     },
   });
-  const [confirmDeleteId, setConfirmDelete] = useState(null);
-  const { add: addNotification } = useNotifications();
-  const navigate = useNavigate();
-  const columnNames = Object.keys(isLoading || fetchFilesError ? {} : files[0]);
-  const handleEdit = (id) => {
-    navigate(`${id}`);
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      const response = await fetch(`/api/training-messages/files/${id}`, {
-        method: 'DELETE',
-      });
-      const data = await response.json();
-      viewTransition(() => {
-        setFiles((files) => files.filter((file) => file.id !== id));
-      });
-
-      addNotification({
-        message: 'Prompt deleted successfully',
-      });
-    } catch (error) {
-      addNotification({
-        message: 'Error deleting prompt',
-      });
-    }
-  };
+  const columnNames = Object.keys(isLoading ? {} : trainingMessages[0]);
 
   const ConfirmDeleteModal = ({ id }) => (
     <Modal
@@ -89,7 +68,7 @@ export default () => {
         {
           label: 'ok',
           onClick: () => {
-            handleDelete(id);
+            deleteTrainingMessage(id);
             setConfirmDelete(null);
           },
         },
@@ -98,14 +77,6 @@ export default () => {
       <p>Are you sure you want to delete this?</p>
     </Modal>
   );
-
-  if (fetchFilesError) {
-    return (
-      <Container>
-        <p>There was an error fetching files</p>
-      </Container>
-    );
-  }
 
   if (isLoading) {
     return (
@@ -128,7 +99,7 @@ export default () => {
         </thead>
 
         <tbody>
-          {files.map((row) => (
+          {trainingMessages.map((row) => (
             <Row key={row.id} id={row.id}>
               {Object.values(row).map((value, index) => (
                 <Cell key={`${value}-${index}`}>{JSON.stringify(value)}</Cell>
@@ -144,6 +115,7 @@ export default () => {
           ))}
         </tbody>
       </Table>
+
       {confirmDeleteId ? <ConfirmDeleteModal id={confirmDeleteId} /> : null}
     </Container>
   );

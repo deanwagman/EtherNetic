@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { styled } from 'styletron-react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Surface from '../Surface';
 import Loading from '../Loading';
 import colors from '../../constants/colors';
@@ -26,56 +27,54 @@ const Container = styled('div', {
 });
 
 export default () => {
-    //   const [confirmDeleteId, setConfirmDelete] = useState(null);
-    const { add: addNotification } = useNotifications();
-    const navigate = useNavigate();
-    const [trainingJobs, fetchTrainingJobs] = useFetchTrainingJobs();
-    const columnNames = Object.keys(trainingJobs[0] || {});
+  const [confirmCancelId, setConfirmCancel] = useState(null);
+  const { add: addNotification } = useNotifications();
+  const navigate = useNavigate();
+  const [trainingJobs, fetchTrainingJobs] = useFetchTrainingJobs();
+  const columnNames = Object.keys(trainingJobs[0] || {});
+  const queryClient = useQueryClient();
+  const { mutate: cancelTrainingJob } = useMutation({
+    mutationKey: 'cancelTrainingJob',
+    mutationFn: async (id) => {
+      const response = await fetch(`/api/training-jobs/${id}/cancel`, {
+        method: 'POST',
+      });
+      const data = await response.json();
 
-  //   const handleEdit = (id) => {
-  //     navigate(`${id}`);
-  //   };
+      if (data.error) {
+        throw new Error(data.error.message);
+      }
 
-  //   const handleDelete = async (id) => {
-  //     try {
-  //       const response = await fetch(`/api/training-jobs/${id}`, {
-  //         method: 'DELETE',
-  //       });
-  //       const data = await response.json();
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['training-jobs'] });
+      addNotification({
+        message: 'Training job cancelled successfully',
+      });
+    },
+    onError: (error) => {
+      addNotification({ message: error.message });
+    },
+  });
 
-  //       // This is broken as we're pulling resources from abstraction
-  //       //   viewTransition(() => {
-  //       //     setItems((items) => items.filter((item) => item.id !== id));
-  //       //   });
-
-  //       addNotification({
-  //         message: 'Prompt deleted successfully',
-  //       });
-  //     } catch (error) {
-  //       addNotification({
-  //         message: 'Error deleting prompt',
-  //       });
-  //     }
-  //   };
-
-  //   const ConfirmDeleteModal = ({ id }) => (
-  //     <Modal
-  //       onClose={() => setConfirmDelete(null)}
-  //       options={[
-  //         { label: 'cancel', onClick: () => setConfirmDelete(null) },
-  //         {
-  //           label: 'ok',
-  //           onClick: () => {
-  //             handleDelete(id);
-  //             setConfirmDelete(null);
-  //           },
-  //         },
-  //       ]}
-  //     >
-  //       <p>Are you sure you want to delete this?</p>
-  //     </Modal>
-  //   );
-
+  const ConfirmCancelModal = ({ id }) => (
+    <Modal
+      onClose={() => setConfirmCancel(null)}
+      options={[
+        { label: 'cancel', onClick: () => setConfirmCancel(null) },
+        {
+          label: 'ok',
+          onClick: () => {
+            cancelTrainingJob(id);
+            setConfirmCancel(null);
+          },
+        },
+      ]}
+    >
+      <p>Are you sure you want to cancel this?</p>
+    </Modal>
+  );
 
   return (
     <Container>
@@ -103,10 +102,11 @@ export default () => {
                   ))}
                   <Cell>
                     <ButtonContainer>
-                      {/* <Button onClick={() => handleEdit(row.id)}>Edit</Button>
-                      <Button onClick={() => setConfirmDelete(row.id)}>
-                        Delete
-                      </Button> */}
+                      {row.status === 'running' ? (
+                        <Button onClick={() => setConfirmCancel(row.id)}>
+                          Cancel
+                        </Button>
+                      ) : null}
                     </ButtonContainer>
                   </Cell>
                 </Row>
@@ -116,7 +116,7 @@ export default () => {
         </>
       )}
 
-      {/* {confirmDeleteId ? <ConfirmDeleteModal id={confirmDeleteId} /> : null} */}
+      {confirmCancelId ? <ConfirmCancelModal id={confirmCancelId} /> : null}
     </Container>
   );
 };

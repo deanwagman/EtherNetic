@@ -3,17 +3,15 @@ import App from '../App';
 import Login from '../components/Login';
 import Register from '../components/Register';
 import Etherboard from '../components/Etherboard';
-import EtherTome from '../components/EtherTome';
+import CreateTrainingMessages from '../components/TrainingMessages/CreateTrainingMessages';
 import CreatePrompt from '../components/prompts/CreatePrompt';
 import EditPrompt from '../components/prompts/EditPrompt';
 import RainingImage from '../components/RainingImage';
 import Terminal from '../components/Terminal';
-import FileUpload from '../components/EtherTome/FileUpload';
-// import TrainingJobs from '../components/EtherTome/TrainingJobs';
-import ViewTable from '../components/Table/View';
+import UploadFile from '../components/Files/UploadFile';
+import TrainingMessages from '../components/TrainingMessages';
 import ViewPrompts from '../components/Prompts/ViewPrompts';
 import ViewFiles from '../components/Files/ViewFiles';
-import CreateFile from '../components/Files/CreateFile';
 import ViewTrainingJobs from '../components/TrainingJobs/ViewTrainingJobs';
 import CreateTrainingJob from '../components/TrainingJobs/CreateTrainingJob';
 
@@ -49,11 +47,11 @@ export default [
 
       {
         path: 'training-messages',
-        element: <ViewTable resource="training-messages" />,
+        element: <TrainingMessages />,
       },
       {
         path: 'training-messages/new',
-        element: <EtherTome />,
+        element: <CreateTrainingMessages />,
       },
       {
         path: 'raining-image',
@@ -64,16 +62,12 @@ export default [
         element: <Terminal />,
       },
       {
-        path: 'file-upload',
-        element: <FileUpload />,
+        path: 'files/upload',
+        element: <UploadFile />,
       },
       {
         path: 'files',
         element: <ViewFiles />,
-      },
-      {
-        path: 'files/new',
-        element: <CreateFile />,
       },
       {
         path: 'training-jobs',

@@ -1,21 +1,27 @@
 import React, { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export default () => {
-  const [trainingJobs, setTrainingJobs] = useState([]);
   const fetchTrainingJobs = async () => {
     try {
       const response = await fetch('/api/training-jobs');
       const { data } = await response.json();
 
-      setTrainingJobs(data);
+      return data;
     } catch (error) {
       console.error(error);
     }
   };
 
-  useEffect(() => {
-    fetchTrainingJobs();
-  }, []);
+  const queryClient = useQueryClient();
+  const {
+    data: trainingJobs,
+    isLoading,
+    error,
+  } = useQuery(['training-jobs'], fetchTrainingJobs);
 
-  return [trainingJobs, fetchTrainingJobs];
+  const invalidateTrainingJobs = () =>
+    queryClient.invalidateQueries('training-jobs');
+
+  return [trainingJobs || [], invalidateTrainingJobs];
 };

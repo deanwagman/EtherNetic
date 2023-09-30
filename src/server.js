@@ -48,12 +48,14 @@ import autoComplete from './api/chat/autoComplete';
 
 import createTrainingMessages from './api/training-messages/create';
 import getTrainingMessages from './api/training-messages/getAll';
-import fileUpload from './api/training-messages/file-upload';
-import getAllFiles from './api/training-messages/getAllFiles';
-import deleteFile from './api/training-messages/deleteFile';
+import deleteTrainingMessage from './api/training-messages/delete';
+import uploadFile from './api/files/uploadFile';
+import deleteFile from './api/files/deleteFile';
+import getAllFiles from './api/files/getAllFiles';
 
 import getTrainingJobs from './api/training-jobs/get';
 import createTrainingJob from './api/training-jobs/create';
+import cancelTrainingJob from './api/training-jobs/cancel';
 
 import getModels from './api/fine-tune/getModels';
 
@@ -103,12 +105,15 @@ app.route('/api/prompts/:id').get(getPrompt);
 
 app.route('/api/training-messages').post(createTrainingMessages);
 app.route('/api/training-messages').get(getTrainingMessages);
-app.route('/api/training-messages/files').post(fileUpload);
-app.route('/api/training-messages/files').get(getAllFiles);
-app.route('/api/training-messages/files/:id').delete(deleteFile);
+app.route('/api/training-messages/:id').delete(deleteTrainingMessage);
+
+app.route('/api/files/upload').post(uploadFile);
+app.route('/api/files').get(getAllFiles);
+app.route('/api/files/:id').delete(deleteFile);
 
 app.route('/api/training-jobs').get(getTrainingJobs);
 app.route('/api/training-jobs').post(createTrainingJob);
+app.route('/api/training-jobs/:id/cancel').post(cancelTrainingJob);
 
 app.route('/api/fine-tune/models').get(getModels);
 
@@ -137,7 +142,11 @@ app.get('*', async (req, res) => {
   // Extract CSS from Styletron
   const styles = engine.getCss();
 
-  res.send(renderToString(<Document styles={styles} html={html} state={dehydratedState} />));
+  res.send(
+    renderToString(
+      <Document styles={styles} html={html} state={dehydratedState} />,
+    ),
+  );
 });
 
 app.listen(port, async () => {

@@ -1,8 +1,10 @@
 import React from 'react';
 import { styled } from 'styletron-react';
+import { useMutation } from '@tanstack/react-query';
 import Surface from '../Surface';
 import Title from '../Form/Title';
 import Button from '../Form/Button';
+import useNotification from '../../hooks/useNotifications';
 
 const Container = styled('div', {
   display: 'flex',
@@ -23,13 +25,33 @@ const Form = styled('div', {
 });
 
 export default () => {
-  const triggerFileUpload = async () => {
-    const response = await fetch('/api/training-messages/file-upload', {
-      method: 'POST',
-    });
+  const { add: addNotification } = useNotification();
 
-    console.log({ response });
-  };
+  const {
+    mutate: triggerFileUpload,
+    isLoading,
+    isError,
+    error,
+    data,
+  } = useMutation({
+    mutationFn: async () => {
+      const response = await fetch('/api/files/upload', {
+        method: 'POST',
+      });
+      const data = await response.json();
+      return data;
+    },
+    onSuccess: () => {
+      addNotification({
+        message: 'File uploaded successfully',
+      });
+    },
+    onError: (error) => {
+      addNotification({
+        message: 'File upload failed',
+      });
+    },
+  });
 
   return (
     <Container>
