@@ -26,6 +26,14 @@ const Container = styled('div', {
   padding: '5em',
 });
 
+const CreateButtonContainer = styled('div', {
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  gap: '1em',
+  padding: '5em',
+});
+
 const fetchPrompts = async () => {
   try {
     const response = await fetch('/api/prompts');
@@ -48,7 +56,7 @@ export default () => {
     mutationKey: 'deletePrompt',
     mutationFn: (id) => fetch(`/api/prompts/${id}`, { method: 'DELETE' }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['prompts']});
+      queryClient.invalidateQueries({ queryKey: ['prompts'] });
       addNotification({
         message: 'Prompt deleted successfully',
       });
@@ -93,7 +101,9 @@ export default () => {
         <Loading />
       ) : (
         <>
-          <Button onClick={() => navigate(`new`)}>Create Prompt</Button>
+          <CreateButtonContainer>
+            <Button onClick={() => navigate(`new`)}>Create Prompt</Button>
+          </CreateButtonContainer>
           <Table>
             <thead>
               <Row id="table-header">

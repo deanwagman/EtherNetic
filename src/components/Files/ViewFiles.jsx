@@ -19,11 +19,21 @@ import {
 
 const Container = styled('div', {
   padding: '5em',
-  overflowX: 'auto',
+  overflow: 'auto',
+  height: '100%',
 });
 
+const CreateButtonContainer = styled('div', {
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  gap: '1em',
+  padding: '5em',
+});
+
+
 const fetchFiles = async () => {
-  const response = await fetch('/api/training-messages/files');
+  const response = await fetch('/api/files');
   const data = await response.json();
   return data;
 };
@@ -40,7 +50,7 @@ export default () => {
   const { mutate: deleteFile } = useMutation({
     mutationKey: 'deleteFile',
     mutationFn: (id) =>
-      fetch(`/api/training-messages/files/${id}`, { method: 'DELETE' }),
+      fetch(`/api/files/${id}`, { method: 'DELETE' }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['files'] });
       addNotification({
@@ -117,6 +127,10 @@ export default () => {
 
   return (
     <Container>
+      <CreateButtonContainer>
+        <Button onClick={() => navigate('upload')}>Upload</Button>
+      </CreateButtonContainer>
+
       <Table>
         <thead>
           <Row id="table-header">
