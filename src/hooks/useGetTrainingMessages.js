@@ -1,18 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 export default () => {
-  const [trainingMessages, setTrainingMessages] = useState([]);
-
-  useEffect(() => {
-    const getTrainingMessages = async () => {
+  const {
+    data: trainingMessages,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ['trainingMessages'],
+    queryFn: async () => {
       const response = await fetch('/api/training-messages');
       const { messages } = await response.json();
 
-      setTrainingMessages(messages);
-    };
+      return messages;
+    },
+  });
 
-    getTrainingMessages();
-  }, []);
-
-  return trainingMessages;
+  return isLoading ? [] : trainingMessages;
 };

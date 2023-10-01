@@ -43,9 +43,9 @@ export default ({ html, styles, state }) => (
       <div id="root" dangerouslySetInnerHTML={{ __html: html }} />
       <div id="modal-root" />
       <script type="text/javascript" src="/dist/bundle.js" defer></script>
-      <script>{`window.__REACT_QUERY_STATE__ = ${JSON.stringify(
-        state,
-      )}`}</script>
+      <script type="text/javascript">
+        window.__REACT_QUERY_STATE__ = {JSON.stringify(state)};
+      </script>
     </body>
   </html>
 );

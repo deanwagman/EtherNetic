@@ -91,11 +91,6 @@ export default () => {
   return (
     <Container>
       <Surface $style={surfaceStyles}>
-        <OptionButton
-          onChange={() => fetchSummary(messages)}
-          label="Summarize"
-          value={false}
-        />
         <ModelSelector selected={selectedModel} onChange={handleModelChange} />
         <ButtonContainer>
           {isPromptOptionsLocked && (

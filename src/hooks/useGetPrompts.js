@@ -1,13 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 export default () => {
-  const [prompts, setPrompts] = useState([]);
+  const {
+    data: prompts,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ['prompts'],
+    queryFn: async () => {
+      const response = await fetch('/api/prompts');
+      const data = await response.json();
 
-  useEffect(() => {
-    fetch('/api/prompts')
-      .then((response) => response.json())
-      .then((data) => setPrompts(data));
-  }, []);
+      return data;
+    },
+  });
 
-  return prompts;
+  return isLoading ? [] : prompts;
 };
